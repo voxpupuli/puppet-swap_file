@@ -1,24 +1,20 @@
-require 'puppetlabs_spec_helper/module_spec_helper'
+# frozen_string_literal: true
 
-# SimpleCov does not run on Ruby 1.8.7
-unless RUBY_VERSION.to_f < 1.9
-  require 'simplecov'
-  require 'simplecov-console'
-  SimpleCov.formatters = [
-    SimpleCov::Formatter::HTMLFormatter,
-    SimpleCov::Formatter::Console,
-  ]
-  SimpleCov.start do
-    coverage_dir('coverage/')
-    add_filter('/spec/')
+# Managed by modulesync - DO NOT EDIT
+# https://voxpupuli.org/docs/updating-files-managed-with-modulesync/
+
+# puppetlabs_spec_helper will set up coverage if the env variable is set.
+# We want to do this if lib exists and it hasn't been explicitly set.
+ENV['COVERAGE'] ||= 'yes' if Dir.exist?(File.expand_path('../lib', __dir__))
+
+require 'voxpupuli/test/spec_helper'
+
+add_mocked_facts!
+
+if File.exist?(File.join(__dir__, 'default_module_facts.yml'))
+  facts = YAML.safe_load(File.read(File.join(__dir__, 'default_module_facts.yml')))
+  facts&.each do |name, value|
+    add_custom_fact name.to_sym, value
   end
 end
-
-RSpec.configure do |config|
-  config.hiera_config = 'spec/fixtures/hiera/hiera.yaml'
-  config.expect_with :rspec do |c|
-    c.max_formatted_output_length = 999
-  end
-end
-
-at_exit { RSpec::Puppet::Coverage.report! }
+Dir['./spec/support/spec/**/*.rb'].sort.each { |f| require f }
