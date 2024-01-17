@@ -12,12 +12,10 @@
 class swap_file::swappiness (
   $swappiness = 60,
 ) {
-
   validate_legacy(Integer, 'validate_integer', $swappiness, [100, 0])
 
   sysctl { 'vm.swappiness':
     ensure => 'present',
     value  => $swappiness,
   }
-
 }

@@ -43,7 +43,6 @@ class swap_file (
   $files             = {},
   $files_hiera_merge = false,
 ) {
-
   # variable handling
   if $files_hiera_merge =~ Boolean {
     $files_hiera_merge_bool = $files_hiera_merge
