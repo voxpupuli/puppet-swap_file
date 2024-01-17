@@ -1,12 +1,12 @@
 {
-  "name": "petems-swap_file",
-  "version": "4.0.3",
-  "author": "Peter Souter",
+  "name": "puppet-swap_file",
+  "version": "4.0.4-rc0",
+  "author": "Vox Pupuli",
   "summary": "Create swap files for Linux systems with Puppet",
   "license": "Apache-2.0",
-  "source": "https://github.com/petems/petems-swap_file",
-  "project_page": "https://github.com/petems/petems-swap_file",
-  "issues_url": "https://github.com/petems/petems-swap_file/issues",
+  "source": "https://github.com/voxpupuli/puppet-swap_file.git",
+  "project_page": "https://github.com/voxpupuli/puppet-swap_file",
+  "issues_url": "https://github.com/voxpupuli/puppet-swap_file/issues",
   "operatingsystem_support": [
     {
       "operatingsystem": "RedHat",
