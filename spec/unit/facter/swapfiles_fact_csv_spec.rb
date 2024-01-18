@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Facter::Util::Fact do
@@ -40,7 +42,7 @@ describe Facter::Util::Fact do
           /dev/dm-2                               partition 16612860  0 -1
         EOS
         Facter::Util::Resolution.expects(:exec).with('cat /proc/swaps').returns(proc_swap_output)
-        expect(Facter.value(:swapfile_sizes_csv)).to eq(nil)
+        expect(Facter.value(:swapfile_sizes_csv)).to be_nil
       end
     end
   end

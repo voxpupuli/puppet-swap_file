@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'beaker-rspec'
 
 unless ENV['RS_PROVISION'] == 'no'
@@ -11,7 +13,7 @@ unless ENV['RS_PROVISION'] == 'no'
   end
 end
 
-UNSUPPORTED_PLATFORMS = ['windows']
+UNSUPPORTED_PLATFORMS = ['windows'].freeze
 
 RSpec.configure do |c|
   # Project root

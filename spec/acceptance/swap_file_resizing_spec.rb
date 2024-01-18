@@ -1,11 +1,8 @@
+# frozen_string_literal: true
+
 require 'spec_helper_acceptance'
 
 describe 'swap_file class', unless: UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
-  context 'disable stringify_facts' do
-    shell('puppet config set stringify_facts false --section=agent', { acceptable_exit_codes: [0, 1] })
-    shell('puppet config set stringify_facts false', { acceptable_exit_codes: [0, 1] })
-  end
-
   context 'swap_file' do
     context 'swapfilesize => 100' do
       it 'works with no errors' do

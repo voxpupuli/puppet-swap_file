@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 if File.exist?('/proc/swaps')
   swap_file_hash = {}
 
@@ -14,7 +16,7 @@ if File.exist?('/proc/swaps')
   swap_file_output_array.shift
 
   swap_file_output_array.each do |line|
-    swap_file_line_array = line.gsub(%r{\s+}m, ' ').strip.split(' ')
+    swap_file_line_array = line.gsub(%r{\s+}m, ' ').strip.split
 
     # We only want swap-file information, not paritions
     swap_file_hash[swap_file_line_array[0]] = swap_file_line_array[2] if swap_file_line_array[1] == 'file'

@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'difference_within_margin' do
-  it { is_expected.not_to eq(nil) }
+  it { is_expected.not_to be_nil }
   it { is_expected.to run.with_params([]).and_raise_error(Puppet::ParseError, %r{Wrong number of arguments given \(1 for 2\)}i) }
   it { is_expected.to run.with_params(%w[1 2]).and_raise_error(Puppet::ParseError, %r{Wrong number of arguments given \(1 for 2\)}i) }
   it { is_expected.to run.with_params([], '2').and_raise_error(Puppet::ParseError, %r{arg\[0\] array cannot be empty}i) }

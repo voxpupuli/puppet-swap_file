@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper_acceptance'
 
 describe 'swap_file class', unless: UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do

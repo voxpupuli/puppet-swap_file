@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # swap_file_size_from_csv.rb
 #
@@ -13,8 +15,8 @@ module Puppet::Parser::Functions
   EOS
   ) do |arguments|
     if arguments.size < 2
-      raise(Puppet::ParseError, 'swap_file_size_from_csv(): Wrong number of arguments ' +
-        "given (#{arguments.size} for 2)")
+      raise(Puppet::ParseError, 'swap_file_size_from_csv(): Wrong number of arguments ' \
+                                "given (#{arguments.size} for 2)")
     end
     raise(Puppet::ParseError, "swap_file_size_from_csv(): swapfile name but be a string (Got #{arguments[0].class}") unless arguments[0].is_a? String
     raise(Puppet::ParseError, "swap_file_size_from_csv(): Requires string to work with (Got #{arguments[1].class}") unless arguments[1].is_a? String

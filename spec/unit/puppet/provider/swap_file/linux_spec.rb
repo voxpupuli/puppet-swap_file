@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Puppet::Type.type(:swap_file).provider(:linux) do
@@ -55,14 +57,14 @@ describe Puppet::Type.type(:swap_file).provider(:linux) do
 
   describe 'exists?' do
     it 'checks if swap file exists' do
-      expect(instance.exists?).to be_truthy
+      expect(instance).to exist
     end
   end
 
   describe 'self.instances' do
     it 'returns an array of swapfiles' do
-      swapfiles      = provider.class.instances.collect { |x| x.name }
-      swapfile_sizes = provider.class.instances.collect { |x| x.size }
+      swapfiles      = provider.class.instances.map(&:name)
+      swapfile_sizes = provider.class.instances.map(&:size)
 
       expect(swapfiles).to      include('/dev/sda1', '/dev/sda2')
       expect(swapfile_sizes).to include('4192956', '4454542')

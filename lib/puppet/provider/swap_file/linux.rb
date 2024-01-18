@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Puppet::Type.type(:swap_file).provide(:linux) do
   desc 'Swap file management via `swapon`, `swapoff` and `mkswap`'
 
@@ -21,14 +23,14 @@ Puppet::Type.type(:swap_file).provide(:linux) do
 
   def self.prefetch(resources)
     instances.each do |prov|
-      if resource = resources[prov.name]
+      if (resource = resources[prov.name])
         resource.provider = prov
       end
     end
   end
 
   def self.instances
-    get_swap_files.collect do |swapfile_line|
+    get_swap_files.map do |swapfile_line|
       new(get_swapfile_properties(swapfile_line))
     end
   end

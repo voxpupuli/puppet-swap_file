@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 describe 'swap_file' do
   on_supported_os.each do |os, os_facts|
@@ -152,9 +154,9 @@ describe 'swap_file' do
                 end
               end
             end
-          end # var[:name].each
-        end # validations.sort.each
-      end # describe 'variable type and content validations'
+          end
+        end
+      end
     end
   end
 end

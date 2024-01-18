@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # When given an array of two numbers and a margin, returns true
 # if the difference is less than the margin. Basically statistical
 # range with a margin.
@@ -34,8 +36,8 @@ module Puppet::Parser::Functions
   ) do |arguments|
     # Check that more than 2 arguments have been given ...
     unless arguments.size == 2
-      raise(Puppet::ParseError, 'compare_with_margin(): Wrong number of arguments ' +
-        "given (#{arguments.size} for 2)")
+      raise(Puppet::ParseError, 'compare_with_margin(): Wrong number of arguments ' \
+                                "given (#{arguments.size} for 2)")
     end
 
     # Check that the first parameter is an array
@@ -44,7 +46,7 @@ module Puppet::Parser::Functions
     # Check that the first parameter is an array
     raise(Puppet::ParseError, 'difference_within_margin(): arg[0] array cannot be empty') if arguments[0].empty?
 
-    arguments[0].collect! { |i| i.to_f }
+    arguments[0].map!(&:to_f)
 
     difference = arguments[0].minmax[1].to_f - arguments[0].minmax[0].to_f
 
