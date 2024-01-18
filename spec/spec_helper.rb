@@ -10,6 +10,10 @@ ENV['COVERAGE'] ||= 'yes' if Dir.exist?(File.expand_path('../lib', __dir__))
 require 'voxpupuli/test/spec_helper'
 
 RSpec.configure do |c|
+  c.mock_with :mocha
+end
+
+RSpec.configure do |c|
   c.hiera_config = 'spec/fixtures/hiera/hiera.yaml'
 end
 
