@@ -57,7 +57,7 @@ define swap_file::files (
             swapfile_path          => $swapfile,
             margin                 => $resize_margin,
             expected_swapfile_size => $swapfilesize,
-            actual_swapfile_size   => $facts['swapfile_sizes[$swapfile]'],
+            actual_swapfile_size   => $facts['swapfile_sizes'][$swapfile],
             verbose                => $resize_verbose,
             before                 => Exec["Create swap file ${swapfile}"],
           }
