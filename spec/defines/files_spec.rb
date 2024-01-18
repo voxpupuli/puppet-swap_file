@@ -3,16 +3,17 @@ require 'spec_helper'
 describe 'swap_file::files' do
   let(:title) { 'default' }
 
-  let(:facts) do
-    {
-      operatingsystem: 'RedHat',
-      osfamily: 'RedHat',
-      operatingsystemrelease: '7',
-      concat_basedir: '/tmp',
-      memorysize: '1.00 GB',
-      selinux: true,
-    }
-  end
+  on_supported_os.each do |os, os_facts|
+    context "on #{os}" do
+      let(:facts) do
+        os_facts.merge({
+          memory: {
+            system: {
+              total: '1.00 GB',
+            }
+          }
+        })
+      end
 
   # Add these two lines in a single test block to enable puppet and hiera debug mode
   # Puppet::Util::Log.level = :debug
@@ -137,23 +138,18 @@ describe 'swap_file::files' do
       end
 
       let(:facts) do
-        {
-          operatingsystem: 'RedHat',
-          osfamily: 'RedHat',
-          operatingsystemrelease: '7',
-          concat_basedir: '/tmp',
-          memorysize: '1.00 GB',
+        super().merge({
           swapfile_sizes: {
             '/mnt/swap.resizeme' => existing_swap_kb,
           },
-          swapfile_sizes_csv: "/mnt/swap.resizeme||#{existing_swap_kb}",
-          selinux: true,
-        }
+          swapfiles_sizes_csv: "/mnt/swap.resizeme||#{existing_swap_kb}"
+        })
       end
 
       it do
         is_expected.to compile.with_all_deps
       end
+
       it do
         should contain_swap_file__resize('/mnt/swap.resizeme').with('swapfile_path' => '/mnt/swap.resizeme',
                                                                     'margin'                 => '50MB',
@@ -190,16 +186,9 @@ describe 'swap_file::files' do
         }
       end
       let(:facts) do
-        {
-          operatingsystem: 'RedHat',
-          osfamily: 'RedHat',
-          operatingsystemrelease: '7',
-          concat_basedir: '/tmp',
-          memorysize: '1.00 GB',
-          swapfile_sizes: nil,
-          selinux: true,
-        }
+        super().merge(swapfiles_sizes: nil)
       end
+
       it do
         is_expected.to compile.with_all_deps
       end
@@ -215,19 +204,15 @@ describe 'swap_file::files' do
         }
       end
       let(:facts) do
-        {
-          operatingsystem: 'RedHat',
-          osfamily: 'RedHat',
-          operatingsystemrelease: '7',
-          concat_basedir: '/tmp',
-          memorysize: '1.00 GB',
+        super().merge({
           swapfile_sizes: {
             '/mnt/swap.differentname' => '204796', # 200MB
           },
           swapfile_sizes_csv: "/mnt/swap.differentname||#{existing_swap_kb}",
-          selinux: true,
-        }
+
+        })
       end
+
       it do
         is_expected.to compile.with_all_deps
       end
@@ -253,16 +238,10 @@ describe 'swap_file::files' do
       let(:existing_swap_kb) { '204796' } # 200MB
 
       let(:facts) do
-        {
-          operatingsystem: 'RedHat',
-          osfamily: 'RedHat',
-          operatingsystemrelease: '7',
-          concat_basedir: '/tmp',
-          memorysize: '1.00 GB',
+        super().merge({
           swapfile_sizes: "/mnt/swap.resizeme#{existing_swap_kb}",
           swapfile_sizes_csv: "/mnt/swap.resizeme||#{existing_swap_kb}",
-          selinux: true,
-        }
+        })
       end
 
       it do
@@ -304,17 +283,12 @@ describe 'swap_file::files' do
         }
       end
       let(:facts) do
-        {
-          operatingsystem: 'RedHat',
-          osfamily: 'RedHat',
-          operatingsystemrelease: '7',
-          concat_basedir: '/tmp',
-          memorysize: '1.00 GB',
+        super().merge({
           swapfile_sizes: nil,
           swapfile_sizes_csv: nil,
-          selinux: true,
-        }
+        })
       end
+
       it do
         is_expected.to compile.with_all_deps
       end
@@ -330,17 +304,12 @@ describe 'swap_file::files' do
         }
       end
       let(:facts) do
-        {
-          operatingsystem: 'RedHat',
-          osfamily: 'RedHat',
-          operatingsystemrelease: '7',
-          concat_basedir: '/tmp',
-          memorysize: '1.00 GB',
+        super().merge({
           swapfile_sizes: "/mnt/swap.differentname#{existing_swap_kb}",
           swapfile_sizes_csv: "/mnt/swap.differentname||#{existing_swap_kb}",
-          selinux: true,
-        }
+        })
       end
+
       it do
         is_expected.to compile.with_all_deps
       end
@@ -357,4 +326,6 @@ describe 'swap_file::files' do
     end
   end
 
+end
+  end
 end
