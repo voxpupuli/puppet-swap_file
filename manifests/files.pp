@@ -32,22 +32,19 @@
 #    @petems - Peter Souter
 #
 define swap_file::files (
-  $ensure        = 'present',
-  $swapfile      = '/mnt/swap.1',
-  $swapfilesize  = $facts['memory']['system']['total'],
-  $add_mount     = true,
-  $options       = 'defaults',
-  $timeout       = 300,
-  $cmd           = 'dd',
-  $resize_existing = false,
-  $resize_margin   = '50MB',
-  $resize_verbose  = false,
+  Enum['absent','present'] $ensure = 'present',
+  Stdlib::Unixpath $swapfile       = '/mnt/swap.1',
+  $swapfilesize                    = $facts['memory']['system']['total'],
+  Boolean $add_mount               = true,
+  $options                         = 'defaults',
+  $timeout                         = 300,
+  $cmd                             = 'dd',
+  $resize_existing                 = false,
+  $resize_margin                   = '50MB',
+  $resize_verbose                  = false,
 ) {
   # Parameter validation
-  validate_legacy(String, 'validate_re', $ensure, ['^absent$', '^present$'])
-  validate_legacy(String, 'validate_string', $swapfile)
   $swapfilesize_mb = to_bytes($swapfilesize) / 1048576
-  validate_legacy(Boolean, 'validate_bool', $add_mount)
 
   if $ensure == 'present' {
     if ($resize_existing and $facts['swapfile_sizes']) {
