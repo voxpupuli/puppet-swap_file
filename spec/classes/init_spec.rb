@@ -1,11 +1,18 @@
 require 'spec_helper'
 describe 'swap_file' do
-  let(:facts) do
-    {
-      :memorysize => '1.00 GB',
-      selinux: true,
-    }
-  end
+
+  on_supported_os.each do |os, os_facts|
+    context "on #{os}" do
+      let(:facts) do
+        os_facts.merge({
+          memory: {
+            system: {
+              total: '1.00 GB',
+            }
+          }
+        })
+      end
+
 
   context 'with defaults for all parameters' do
     it { is_expected.to compile.with_all_deps }
@@ -47,12 +54,11 @@ describe 'swap_file' do
 
   describe 'with data for swap_file::files provided in multiple hiera levels' do
     let(:facts) do
+      super().merge(
       {
-        :fqdn              => 'files',
-        :parameter_tests   => 'files_hiera_merge',
-        :memorysize        => '1.00 GB',
-        :selinux           => true,
-      }
+        fqdn:            'files',
+        parameter_tests: 'files_hiera_merge',
+      })
     end
 
     context 'when files_hiera_merge is set to the default value <false>' do
@@ -102,14 +108,7 @@ describe 'swap_file' do
   end
 
   describe 'variable type and content validations' do
-    # set needed custom facts and variables
-    let(:facts) do
-      {
-        :osfamily => 'RedHat',
-        :memorysize => '1.00 GB',
-        :selinux    => true,
-      }
-    end
+    # set needed variables
     let(:validation_params) do
       {
         #:param => 'value',
@@ -153,4 +152,6 @@ describe 'swap_file' do
       end # var[:name].each
     end # validations.sort.each
   end # describe 'variable type and content validations'
+end
+  end
 end
