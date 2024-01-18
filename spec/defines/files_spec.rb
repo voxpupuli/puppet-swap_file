@@ -68,7 +68,7 @@ describe 'swap_file::files' do
         end
       end
 
-      context 'custom swapfilesize parameter with timeout' do
+      context 'custom swapfilesize parameter with timeout' do  # rubocop:todo RSpec/RepeatedExampleGroupDescription,RSpec/RepeatedExampleGroupBody
         let(:params) do
           {
             swapfile: '/mnt/swap.2',
@@ -88,7 +88,7 @@ describe 'swap_file::files' do
         end
       end
 
-      context 'custom swapfilesize parameter with timeout' do
+      context 'custom swapfilesize parameter with timeout' do  # rubocop:todo RSpec/RepeatedExampleGroupDescription,RSpec/RepeatedExampleGroupBody
         let(:params) do
           {
             swapfile: '/mnt/swap.2',
@@ -110,7 +110,7 @@ describe 'swap_file::files' do
 
       context 'custom swapfilesize parameter with fallocate' do
         let(:params) do
-          {
+          { # rubocop:todo Lint/Void
             swapfile: '/mnt/swap.3',
             swapfilesize: '4.1 GB',
             cmd: 'fallocate'
@@ -196,7 +196,7 @@ describe 'swap_file::files' do
           end
         end
 
-        context 'when swapfile_sizes fact does not exist' do
+        context 'when swapfile_sizes fact does not exist' do # rubocop:todo RSpec/RepeatedExampleGroupDescription
           let(:params) do
             {
               swapfile: '/mnt/swap.nofact',
@@ -216,7 +216,7 @@ describe 'swap_file::files' do
           end
         end
 
-        context 'when swapfile_sizes fact exits but file does not match' do
+        context 'when swapfile_sizes fact exits but file does not match' do # rubocop:todo RSpec/RepeatedExampleGroupDescription
           let(:params) do
             {
               swapfile: '/mnt/swap.factbutnomatch',
@@ -304,7 +304,7 @@ describe 'swap_file::files' do
           end
         end
 
-        context 'when swapfile_sizes fact does not exist' do
+        context 'when swapfile_sizes fact does not exist' do # rubocop:todo RSpec/RepeatedExampleGroupDescription
           let(:params) do
             {
               swapfile: '/mnt/swap.nofact',
@@ -327,7 +327,7 @@ describe 'swap_file::files' do
           end
         end
 
-        context 'when swapfile_sizes fact exits but file does not match' do
+        context 'when swapfile_sizes fact exits but file does not match' do  # rubocop:todo RSpec/RepeatedExampleGroupDescription
           let(:params) do
             {
               swapfile: '/mnt/swap.factbutnomatch',

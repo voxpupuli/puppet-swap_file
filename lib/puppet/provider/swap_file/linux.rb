@@ -15,7 +15,7 @@ Puppet::Type.type(:swap_file).provide(:linux) do
     @property_flush = {}
   end
 
-  def self.get_swap_files
+  def self.get_swap_files # rubocop:todo Naming/AccessorMethodName
     swapfiles = swapon(['-s']).split("\n")
     swapfiles.shift
     swapfiles.sort
@@ -36,7 +36,7 @@ Puppet::Type.type(:swap_file).provide(:linux) do
   end
 
   def self.get_swapfile_properties(swapfile_line)
-    swapfile_properties = {}
+    swapfile_properties = {} # rubocop:todo Lint/UselessAssignment
 
     # swapon -s output formats thus:
     # Filename        Type    Size  Used  Priority

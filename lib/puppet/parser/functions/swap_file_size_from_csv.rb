@@ -26,7 +26,7 @@ module Puppet::Parser::Functions
     swapfile_found = false
 
     lines.each do |swapfile_csv|
-      swapfile_csv_array = swapfile_csv.split(',')
+      swapfile_csv_array = swapfile_csv.split(',') # rubocop:todo Lint/UselessAssignment
       swapfile_name = swapfile_csv.split('||')[0]
       swapfile_size = swapfile_csv.split('||')[1]
       swapfile_found = swapfile_size if arguments[0] == swapfile_name
