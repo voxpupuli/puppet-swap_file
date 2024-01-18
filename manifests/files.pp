@@ -51,8 +51,8 @@ define swap_file::files (
 
   if $ensure == 'present' {
     if ($resize_existing and $facts['swapfile_sizes']) {
-      if (is_hash($facts['swapfile_sizes'])) {
-        if (has_key($facts['swapfile_sizes'],$swapfile)) {
+      if ($facts['swapfile_sizes'] =~ Hash) {
+        if ($swapfile in $facts['swapfile_sizes']) {
           ::swap_file::resize { $swapfile:
             swapfile_path          => $swapfile,
             margin                 => $resize_margin,
