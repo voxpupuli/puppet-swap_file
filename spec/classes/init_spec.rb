@@ -10,7 +10,8 @@ describe 'swap_file' do
                            system: {
                              total: '1.00 GB',
                            }
-                         }
+                         },
+                         parameter_tests: '', # Default so hiera does not fail.
                        })
       end
 
