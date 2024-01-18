@@ -12,7 +12,6 @@ describe Facter::Util::Fact do
       before do
         Facter.fact(:kernel).stubs(:value).returns('Linux')
         File.stubs(:exists?)
-        File.expects(:exists?).with('/proc/swaps').returns(true)
         Facter::Util::Resolution.stubs(:exec)
       end
 

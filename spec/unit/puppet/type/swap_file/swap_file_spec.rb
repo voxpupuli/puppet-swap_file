@@ -11,7 +11,6 @@ describe Puppet::Type.type(:swap_file) do
     @resource = stub 'resource', resource: nil, provider: @provider # rubocop:todo RSpec/InstanceVariable
 
     @class.stubs(:defaultprovider).returns @provider_class # rubocop:todo RSpec/InstanceVariable
-    @class.any_instance.stubs(:provider).returns @provider # rubocop:todo RSpec/InstanceVariable,RSpec/AnyInstance
   end
 
   it 'has :name as its keyattribute' do
