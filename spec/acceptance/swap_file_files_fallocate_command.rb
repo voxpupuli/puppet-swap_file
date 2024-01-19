@@ -2,8 +2,8 @@
 
 require 'spec_helper_acceptance'
 
-describe 'swap_file::files defined type', unless: UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
-  context 'fallocate command', unless: ['FreeBSD'].include?(fact('osfamily')) do
+describe 'swap_file::files defined type' do
+  context 'fallocate command', unless: ['FreeBSD'].include?(fact('os.family')) do
     it 'works with no errors' do
       pp = <<-EOS
       swap_file::files { 'default':

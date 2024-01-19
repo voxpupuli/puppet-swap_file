@@ -2,7 +2,7 @@
 
 require 'spec_helper_acceptance'
 
-describe 'swap_file::files defined type', unless: UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
+describe 'swap_file::files defined type' do
   context 'swap_file' do
     context 'ensure => present' do
       it 'works with no errors' do
