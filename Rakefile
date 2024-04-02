@@ -1,50 +1,44 @@
-require 'puppetlabs_spec_helper/rake_tasks'
-require 'puppet-lint/tasks/puppet-lint'
-require 'puppet-syntax/tasks/puppet-syntax'
+# Managed by modulesync - DO NOT EDIT
+# https://voxpupuli.org/docs/updating-files-managed-with-modulesync/
 
-# These two gems aren't always present, for instance
-# on Travis with --without development
+# Attempt to load voxpupuli-test (which pulls in puppetlabs_spec_helper),
+# otherwise attempt to load it directly.
 begin
-  require 'puppet_blacksmith/rake_tasks'
+  require 'voxpupuli/test/rake'
 rescue LoadError
-end
-
-PuppetLint.configuration.fail_on_warnings
-PuppetLint.configuration.send('relative')
-PuppetLint.configuration.send('disable_80chars')
-PuppetLint.configuration.send('disable_class_inherits_from_params_class')
-PuppetLint.configuration.send('disable_class_parameter_defaults')
-PuppetLint.configuration.send('disable_documentation')
-PuppetLint.configuration.send('disable_single_quote_string_with_variables')
-PuppetLint.configuration.ignore_paths = ["spec/**/*.pp", "pkg/**/*.pp"]
-
-exclude_paths = [
-  "pkg/**/*",
-  "vendor/**/*",
-  "spec/**/*",
-]
-PuppetLint.configuration.ignore_paths = exclude_paths
-PuppetSyntax.exclude_paths = exclude_paths
-
-desc "Run acceptance tests"
-RSpec::Core::RakeTask.new(:acceptance) do |t|
-  t.pattern = 'spec/acceptance'
-end
-
-desc "Run syntax, lint, and spec tests."
-task :test => [
-  :syntax,
-  :lint,
-  :spec,
-]
-
-begin
-  require 'github_changelog_generator/task'
-  GitHubChangelogGenerator::RakeTask.new :changelog do |config|
-    version = (Blacksmith::Modulefile.new).version
-    config.future_release = "v#{version}"
-    config.header = "# Change Log\n\nAll notable changes to this project will be documented in this file."
-    config.exclude_labels = %w{duplicate question invalid wontfix modulesync}
+  begin
+    require 'puppetlabs_spec_helper/rake_tasks'
+  rescue LoadError
   end
+end
+
+# load optional tasks for acceptance
+# only available if gem group releases is installed
+begin
+  require 'voxpupuli/acceptance/rake'
 rescue LoadError
 end
+
+# load optional tasks for releases
+# only available if gem group releases is installed
+begin
+  require 'voxpupuli/release/rake_tasks'
+rescue LoadError
+  # voxpupuli-release not present
+else
+  GCGConfig.user = 'voxpupuli'
+  GCGConfig.project = 'puppet-swap_file'
+end
+
+desc "Run main 'test' task and report merged results to coveralls"
+task test_with_coveralls: [:test] do
+  if Dir.exist?(File.expand_path('../lib', __FILE__))
+    require 'coveralls/rake/task'
+    Coveralls::RakeTask.new
+    Rake::Task['coveralls:push'].invoke
+  else
+    puts 'Skipping reporting to coveralls.  Module has no lib dir'
+  end
+end
+
+# vim: syntax=ruby

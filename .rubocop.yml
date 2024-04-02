@@ -1,5 +1,6 @@
+---
 # Managed by modulesync - DO NOT EDIT
 # https://voxpupuli.org/docs/updating-files-managed-with-modulesync/
 
---format documentation
---color
+inherit_gem:
+  voxpupuli-test: rubocop.yml

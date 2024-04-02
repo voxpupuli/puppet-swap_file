@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'beaker-rspec'
 
 unless ENV['RS_PROVISION'] == 'no'
@@ -11,7 +13,7 @@ unless ENV['RS_PROVISION'] == 'no'
   end
 end
 
-UNSUPPORTED_PLATFORMS = ['windows']
+UNSUPPORTED_PLATFORMS = ['windows'].freeze
 
 RSpec.configure do |c|
   # Project root
@@ -23,11 +25,11 @@ RSpec.configure do |c|
   # Configure all nodes in nodeset
   c.before :suite do
     # Install module and dependencies
-    puppet_module_install(:source => proj_root, :module_name => 'swap_file')
-    hosts.each do |host|
-      shell('puppet module install puppetlabs-stdlib --version 4.7.0', { :acceptable_exit_codes => [0] })
-      shell('puppet module install herculesteam/augeasproviders_core --version 2.1.0', { :acceptable_exit_codes => [0] })
-      shell('puppet module install herculesteam/augeasproviders_sysctl --version 2.1.0', { :acceptable_exit_codes => [0] })
+    puppet_module_install(source: proj_root, module_name: 'swap_file')
+    hosts.each do |_host|
+      shell('puppet module install puppetlabs-stdlib --version 4.7.0', { acceptable_exit_codes: [0] })
+      shell('puppet module install herculesteam/augeasproviders_core --version 2.1.0', { acceptable_exit_codes: [0] })
+      shell('puppet module install herculesteam/augeasproviders_sysctl --version 2.1.0', { acceptable_exit_codes: [0] })
     end
   end
 end
