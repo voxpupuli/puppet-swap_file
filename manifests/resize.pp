@@ -16,11 +16,11 @@
 # @author - Peter Souter
 #
 define swap_file::resize (
-  $swapfile_path,
+  Stdlib::Absolutepath $swapfile_path,
   $expected_swapfile_size,
   $actual_swapfile_size,
-  $margin                 = '50MB',
-  $verbose                = false,
+  $margin                             = '50MB',
+  Boolean $verbose                    = false,
 ) {
   $margin_bytes                  = to_bytes($margin)
   $existing_swapfile_bytes       = to_bytes("${actual_swapfile_size}kb")
