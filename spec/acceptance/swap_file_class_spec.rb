@@ -2,49 +2,59 @@
 
 require 'spec_helper_acceptance'
 
-describe 'swap_file class', unless: UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
-  context 'swap_file' do
-    context 'ensure => present' do
-      it 'works with no errors' do
-        pp = <<-EOS
-        class { 'swap_file':
-          files => {
-            'swapfile' => {
-              ensure => 'present',
+describe 'swap_file class' do
+  after(:all) do
+    pp = <<-EOS
+    class { 'swap_file':
+      files => {
+        'swapfile' => {
+          ensure => 'absent',
+        },
+        'use fallocate' => {
+          swapfile => '/tmp/swapfile.fallocate',
+          cmd      => 'fallocate',
+          ensure   => absent,
+        },
+        'remove swap file' => {
+          ensure   => 'absent',
+          swapfile => '/tmp/swapfile.old',
+        },
+      },
+    }
+    EOS
+
+    apply_manifest(pp, catch_failures: true)
+  end
+
+  context 'with multiple files config' do
+    it_behaves_like 'an idempotent resource' do
+      let(:manifest) do
+        <<-PUPPET
+          class { 'swap_file':
+            files => {
+              'swapfile' => {
+                ensure => 'present',
+              },
+              'use fallocate' => {
+                swapfile     => '/tmp/swapfile.fallocate',
+                cmd          => 'fallocate',
+                swapfilesize => '100MB'
+              },
+              'remove swap file' => {
+                ensure       => 'absent',
+                swapfile     => '/tmp/swapfile.old',
+                swapfilesize => '100MB'
+              },
             },
-            'use fallocate' => {
-              swapfile => '/tmp/swapfile.fallocate',
-              cmd      => 'fallocate',
-            },
-            'remove swap file' => {
-              ensure   => 'absent',
-              swapfile => '/tmp/swapfile.old',
-            },
-          },
-        }
-        EOS
-
-        # Run it twice and test for idempotency
-        apply_manifest(pp, catch_failures: true)
-        apply_manifest(pp, catch_changes: true)
+          }
+        PUPPET
       end
+    end
 
-      it 'contains the default swapfile' do
-        shell('/sbin/swapon -s | grep /mnt/swap.1', acceptable_exit_codes: [0])
-      end
-
-      it 'contains the default fstab setting' do
-        shell('cat /etc/fstab | grep /mnt/swap.1', acceptable_exit_codes: [0])
-        shell('cat /etc/fstab | grep defaults', acceptable_exit_codes: [0])
-      end
-
-      it 'contains the default swapfile' do
-        shell('/sbin/swapon -s | grep /tmp/swapfile.fallocate', acceptable_exit_codes: [0])
-      end
-
-      it 'contains the default fstab setting' do
-        shell('cat /etc/fstab | grep /tmp/swapfile.fallocate', acceptable_exit_codes: [0])
-      end
+    describe file('/etc/fstab'), shell('/sbin/swapon -s') do
+      its(:content) { is_expected.to match %r{/mnt/swap.1} }
+      its(:content) { is_expected.to match %r{/tmp/swapfile.fallocate} }
+      its(:content) { is_expected.not_to match %r{/tmp/swapfile.old} }
     end
   end
 end

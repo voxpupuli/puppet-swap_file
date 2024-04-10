@@ -4,17 +4,18 @@
 require 'spec_helper'
 
 describe Puppet::Type.type(:swap_file) do
-  before do
-    @class = described_class
-    @provider_class = @class.provide(:fake) { mk_resource_methods } # rubocop:todo RSpec/InstanceVariable
-    @provider = @provider_class.new # rubocop:todo RSpec/InstanceVariable
-    @resource = stub 'resource', resource: nil, provider: @provider # rubocop:todo RSpec/InstanceVariable
+  # before do
+  #  @class = described_class
+  #  @provider_class = @class.provide(:fake) { mk_resource_methods }
+  #  @provider = @provider_class.new
+  #  @resource = stub 'resource', resource: nil, provider: @provider
 
-    @class.stubs(:defaultprovider).returns @provider_class # rubocop:todo RSpec/InstanceVariable
-  end
+  #  @class.stubs(:defaultprovider).returns @provider_class
+  #  @class.any_instance.stubs(:provider).returns @provider
+  # end
 
   it 'has :name as its keyattribute' do
-    expect(@class.key_attributes).to eq([:file]) # rubocop:todo RSpec/InstanceVariable
+    expect(Puppet::Type.type(:swap_file).key_attributes).to eq([:file])
   end
 
   describe 'when validating attributes' do
@@ -31,13 +32,13 @@ describe Puppet::Type.type(:swap_file) do
 
     params.each do |param|
       it "has a #{param} parameter" do
-        expect(@class.attrtype(param)).to eq(:param) # rubocop:todo RSpec/InstanceVariable
+        expect(Puppet::Type.type(:swap_file).attrtype(param)).to eq(:param)
       end
     end
 
     properties.each do |prop|
       it "has a #{prop} property" do
-        expect(@class.attrtype(prop)).to eq(:property) # rubocop:todo RSpec/InstanceVariable
+        expect(Puppet::Type.type(:swap_file).attrtype(prop)).to eq(:property)
       end
     end
 
@@ -45,7 +46,7 @@ describe Puppet::Type.type(:swap_file) do
       context "path => #{invalid_path}" do
         it 'requires a valid path for file' do
           expect do
-            @class.new({ file: invalid_path }) # rubocop:todo RSpec/InstanceVariable
+            Puppet::Type.type(:swap_file).new({ file: invalid_path })
           end.to raise_error(Puppet::ResourceError, %r{file parameter must be a valid absolute path})
         end
       end
@@ -55,7 +56,7 @@ describe Puppet::Type.type(:swap_file) do
       context "path => #{valid_path}" do
         it 'allows a valid path for file' do
           expect do
-            @class.new({ file: valid_path }) # rubocop:todo RSpec/InstanceVariable
+            Puppet::Type.type(:swap_file).new({ file: valid_path })
           end.not_to raise_error
         end
       end

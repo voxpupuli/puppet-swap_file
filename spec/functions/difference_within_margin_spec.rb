@@ -3,18 +3,24 @@
 require 'spec_helper'
 
 describe 'difference_within_margin' do
-  it { is_expected.not_to be_nil }
-  it { is_expected.to run.with_params([]).and_raise_error(Puppet::ParseError, %r{Wrong number of arguments given \(1 for 2\)}i) }
-  it { is_expected.to run.with_params(%w[1 2]).and_raise_error(Puppet::ParseError, %r{Wrong number of arguments given \(1 for 2\)}i) }
-  it { is_expected.to run.with_params([], '2').and_raise_error(Puppet::ParseError, %r{arg\[0\] array cannot be empty}i) }
+  on_supported_os.each do |os, os_facts|
+    context "on #{os}" do
+      let(:facts) { os_facts }
 
-  it { is_expected.to run.with_params([100, 150], 60).and_return(true) }
-  it { is_expected.to run.with_params([100, 150], 40).and_return(false) }
-  it { is_expected.to run.with_params([213_909_504, 209_711_104], 5_242_880).and_return(true) }
-  it { is_expected.to run.with_params([104_853_504, 209_715_200], 5_242_880).and_return(false) }
+      it { is_expected.not_to be_nil }
+      it { is_expected.to run.with_params([]).and_raise_error(Puppet::ParseError, %r{Wrong number of arguments given \(1 for 2\)}i) }
+      it { is_expected.to run.with_params(%w[1 2]).and_raise_error(Puppet::ParseError, %r{Wrong number of arguments given \(1 for 2\)}i) }
+      it { is_expected.to run.with_params([], '2').and_raise_error(Puppet::ParseError, %r{arg\[0\] array cannot be empty}i) }
 
-  it { is_expected.to run.with_params(%w[100 150], '60').and_return(true) }
-  it { is_expected.to run.with_params(%w[100 150], '40').and_return(false) }
-  it { is_expected.to run.with_params(%w[213909504 209711104], '5242880').and_return(true) }
-  it { is_expected.to run.with_params(%w[104853504 209715200], '5242880').and_return(false) }
+      it { is_expected.to run.with_params([100, 150], 60).and_return(true) }
+      it { is_expected.to run.with_params([100, 150], 40).and_return(false) }
+      it { is_expected.to run.with_params([213_909_504, 209_711_104], 5_242_880).and_return(true) }
+      it { is_expected.to run.with_params([104_853_504, 209_715_200], 5_242_880).and_return(false) }
+
+      it { is_expected.to run.with_params(%w[100 150], '60').and_return(true) }
+      it { is_expected.to run.with_params(%w[100 150], '40').and_return(false) }
+      it { is_expected.to run.with_params(%w[213909504 209711104], '5242880').and_return(true) }
+      it { is_expected.to run.with_params(%w[104853504 209715200], '5242880').and_return(false) }
+    end
+  end
 end

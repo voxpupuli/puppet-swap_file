@@ -40,19 +40,12 @@
 # @author - Peter Souter
 #
 class swap_file (
-  Hash $files                                              = {},
-  Variant[Boolean,Enum['true','false']] $files_hiera_merge = false,
+  Hash $files             = {},
+  Boolean $files_hiera_merge = false,
 ) {
-  # variable handling
-  if $files_hiera_merge =~ Boolean {
-    $files_hiera_merge_bool = $files_hiera_merge
-  } else {
-    $files_hiera_merge_bool = str2bool($files_hiera_merge)
-  }
-
   # functionality
-  if $files_hiera_merge_bool == true {
-    $files_real = lookup('swap_file::files', Hash, 'deep', {})
+  if $files_hiera_merge {
+    $files_real = hiera_hash('swap_file::files', {})
   } else {
     $files_real = $files
   }
