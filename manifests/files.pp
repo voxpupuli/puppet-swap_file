@@ -33,15 +33,15 @@
 #
 define swap_file::files (
   Enum['absent','present'] $ensure = 'present',
-  Stdlib::Unixpath $swapfile       = '/mnt/swap.1',
+  Stdlib::Absolutepath $swapfile   = '/mnt/swap.1',
   $swapfilesize                    = $facts['memory']['system']['total'],
   Boolean $add_mount               = true,
-  $options                         = 'defaults',
+  String $options                  = 'defaults',
   $timeout                         = 300,
-  $cmd                             = 'dd',
-  $resize_existing                 = false,
+  String $cmd                      = 'dd',
+  Bootlan $resize_existing         = false,
   $resize_margin                   = '50MB',
-  $resize_verbose                  = false,
+  Boolean $resize_verbose          = false,
 ) {
   # Parameter validation
   $swapfilesize_mb = to_bytes($swapfilesize) / 1048576
