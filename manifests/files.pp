@@ -39,7 +39,7 @@ define swap_file::files (
   String $options                  = 'defaults',
   $timeout                         = 300,
   String $cmd                      = 'dd',
-  Bootlan $resize_existing         = false,
+  Boolean $resize_existing         = false,
   $resize_margin                   = '50MB',
   Boolean $resize_verbose          = false,
 ) {

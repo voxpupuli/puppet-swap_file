@@ -2,24 +2,20 @@
 
 require 'spec_helper_acceptance'
 
-describe 'swap_file::swappiness class', unless: UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
-  context 'swap_file::swappiness' do
-    context 'swappiness => 75, permanent => false' do
-      it 'works with no errors' do
-        pp = <<-EOS
-        class { 'swap_file::swappiness':
-          swappiness => 75,
-        }
-        EOS
-
-        # Run it twice and test for idempotency
-        apply_manifest(pp, catch_failures: true)
-        apply_manifest(pp, catch_changes: true)
+describe 'swap_file::swappiness class' do
+  context 'with custom parameter' do
+    it_behaves_like 'an idempotent resource' do
+      let(:manifest) do
+        <<-PUPPET
+          class { 'swap_file::swappiness':
+            swappiness => 75,
+          }
+        PUPPET
       end
+    end
 
-      it 'sets the swappiness to 75 in a seperate sysctl file' do
-        shell('/bin/cat /proc/sys/vm/swappiness | grep 75', acceptable_exit_codes: [0])
-      end
+    describe file('/proc/sys/vm/swappiness') do
+      its(:content) { is_expected.to match %r{75} }
     end
   end
 end

@@ -2,81 +2,103 @@
 
 require 'spec_helper_acceptance'
 
-describe 'swap_file::files defined type', unless: UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
-  context 'swap_file' do
-    context 'ensure => present' do
-      it 'works with no errors' do
-        pp = <<-EOS
+describe 'swap_file::files' do
+  after(:context) do
+    pp = <<-EOS
+      swap_file::files { 'default':
+        ensure   => absent,
+      }
+      swap_file::files { 'tmp file swap':
+        ensure   => absent,
+        swapfile => '/tmp/swapfile',
+      }
+      swap_file::files { 'tmp file swap 1':
+        ensure   => absent,
+        swapfile => '/tmp/swapfile1',
+      }
+      swap_file::files { 'tmp file swap 2':
+        ensure   => absent,
+        swapfile => '/tmp/swapfile2',
+      }
+    EOS
+
+    apply_manifest(pp, catch_failures: true)
+  end
+
+  context 'with default parameter' do
+    it_behaves_like 'an idempotent resource' do
+      let(:manifest) do
+        <<-PUPPET
+          swap_file::files { 'default':
+            ensure   => present,
+          }
+        PUPPET
+      end
+    end
+
+    describe file('/etc/fstab'), shell('/sbin/swapon -s') do
+      its(:content) { is_expected.to match %r{/mnt/swap.1} }
+    end
+  end
+
+  context 'with custom swapfile' do
+    it_behaves_like 'an idempotent resource' do
+      let(:manifest) do
+        <<-PUPPET
+          swap_file::files { 'tmp file swap':
+            ensure       => present,
+            swapfile     => '/tmp/swapfile',
+            swapfilesize => '100MB'
+          }
+        PUPPET
+      end
+    end
+
+    describe file('/etc/fstab'), shell('/sbin/swapon -s') do
+      its(:content) { is_expected.to match %r{/tmp/swapfile} }
+    end
+  end
+
+  context 'with multiple resource' do
+    it_behaves_like 'an idempotent resource' do
+      let(:manifest) do
+        <<-PUPPET
+          swap_file::files { 'tmp file swap 1':
+            ensure       => present,
+            swapfile     => '/tmp/swapfile1',
+            swapfilesize => '100MB'
+          }
+
+          swap_file::files { 'tmp file swap 2':
+            ensure       => present,
+            swapfile     => '/tmp/swapfile2',
+            swapfilesize => '100MB'
+          }
+        PUPPET
+      end
+    end
+
+    describe file('/etc/fstab'), shell('/sbin/swapon -s') do
+      its(:content) { is_expected.to match %r{/tmp/swapfile1} }
+      its(:content) { is_expected.to match %r{/tmp/swapfile2} }
+    end
+  end
+
+  context 'with fallocate command' do
+    it_behaves_like 'an idempotent resource' do
+      let(:manifest) do
+        <<-PUPPET
         swap_file::files { 'default':
-          ensure   => present,
+          ensure       => present,
+          cmd          => 'fallocate',
+          swapfilesize => '100MB'
         }
-        EOS
-
-        # Run it twice and test for idempotency
-        apply_manifest(pp, catch_failures: true)
-        apply_manifest(pp, catch_changes: true)
-      end
-
-      it 'contains the default swapfile' do
-        shell('/sbin/swapon -s | grep /mnt/swap.1', acceptable_exit_codes: [0])
-      end
-
-      it 'contains the default fstab setting' do
-        shell('cat /etc/fstab | grep /mnt/swap.1', acceptable_exit_codes: [0])
-        shell('cat /etc/fstab | grep defaults', acceptable_exit_codes: [0])
+        PUPPET
       end
     end
 
-    context 'custom parameters' do
-      it 'works with no errors' do
-        pp = <<-EOS
-        swap_file::files { 'tmp file swap':
-          ensure   => present,
-          swapfile => '/tmp/swapfile',
-        }
-        EOS
-
-        apply_manifest(pp, catch_failures: true)
-        apply_manifest(pp, catch_changes: true)
-      end
-
-      it 'contains the given swapfile' do
-        shell('/sbin/swapon -s | grep /tmp/swapfile', acceptable_exit_codes: [0])
-      end
-
-      it 'contains the default fstab setting' do
-        shell('cat /etc/fstab | grep /tmp/swapfile', acceptable_exit_codes: [0])
-        shell('cat /etc/fstab | grep defaults', acceptable_exit_codes: [0])
-      end
-    end
-
-    context 'multiple swap_file::files' do
-      it 'works with no errors' do
-        pp = <<-EOS
-        swap_file::files { 'tmp file swap 1':
-          ensure   => present,
-          swapfile => '/tmp/swapfile1',
-        }
-
-        swap_file::files { 'tmp file swap 2':
-          ensure   => present,
-          swapfile => '/tmp/swapfile2',
-        }
-        EOS
-
-        apply_manifest(pp, catch_failures: true)
-        apply_manifest(pp, catch_changes: true)
-      end
-
-      it 'contains the given swapfiles' do
-        shell('/sbin/swapon -s | grep /tmp/swapfile1', acceptable_exit_codes: [0])
-        shell('/sbin/swapon -s | grep /tmp/swapfile2', acceptable_exit_codes: [0])
-      end
-
-      it 'contains the default fstab setting' do
-        shell('cat /etc/fstab | grep /tmp/swapfile1', acceptable_exit_codes: [0])
-        shell('cat /etc/fstab | grep /tmp/swapfile2', acceptable_exit_codes: [0])
-      end
+    describe file('/etc/fstab'), shell('/sbin/swapon -s') do
+      its(:content) { is_expected.to match %r{/mnt/swap.1} }
     end
   end
 end
