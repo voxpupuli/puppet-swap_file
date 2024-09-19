@@ -2,8 +2,8 @@
 
 require 'spec_helper_acceptance'
 
-describe 'swap_file::files defined type', unless: UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
-  context 'multiple swap_file::files', unless: ['FreeBSD'].include?(fact('osfamily')) do
+describe 'swap_file::files defined type' do
+  context 'multiple swap_file::files' do
     it 'works with no errors' do
       pp = <<-EOS
       swap_file::files { 'tmp file swap 1':
