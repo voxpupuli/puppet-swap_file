@@ -1,20 +1,24 @@
 # swap_file
 
-[![Puppet
-Forge](http://img.shields.io/puppetforge/v/petems/swap_file.svg)](https://forge.puppetlabs.com/petems/swap_file) [![Build Status](https://travis-ci.org/petems/petems-swap_file.svg?branch=master)](https://travis-ci.org/petems/petems-swap_file) [![Puppet Forge
-Downloads](http://img.shields.io/puppetforge/dt/petems/swap_file.svg)](https://forge.puppetlabs.com/petems/swap_file) [![Puppet Forge
-Endorsement](https://img.shields.io/puppetforge/e/petems/swap_file.svg)](https://forge.puppetlabs.com/petems/swap_file)
+[![CI](https://github.com/voxpupuli/puppet-swap_file/actions/workflows/ci.yml/badge.svg)](https://github.com/voxpupuli/puppet-swap_file/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/voxpupuli/puppet-swap_file.svg)](https://github.com/voxpupuli/puppet-swap_file/blob/master/LICENSE)
+[![puppetmodule.info docs](https://www.puppetmodule.info/images/badge.svg)](https://www.puppetmodule.info/m/puppet-swap_file)
+[![Donated by petems](https://img.shields.io/badge/donated%20by-petems-fb7047.svg)](#transfer-notice)
 
-#### Table of Contents
+[![Puppet Forge Endorsement](https://img.shields.io/puppetforge/e/puppet/swap_file.svg)](https://forge.puppetlabs.com/puppet/swap_file)
+[![Puppet Forge Version](https://img.shields.io/puppetforge/v/puppet/swap_file.svg)](https://forge.puppetlabs.com/puppet/swap_file)
+[![Puppet Forge Score](https://img.shields.io/puppetforge/f/puppet/swap_file.svg)](https://forge.puppetlabs.com/puppet/swap_file)
+[![Puppet Forge Downloads](https://img.shields.io/puppetforge/dt/puppet/swap_file.svg)](https://forge.puppetlabs.com/puppet/swap_file)
+
+## Table of Contents
 
 1. [Overview](#overview)
-2. [Module Description](#module-description)
-3. [Setup](#setup)
+1. [Setup](#setup)
     * [What swap_file affects](#what-swap_file-affects)
-4. [Usage](#usage)
-5. [Limitations](#limitations)
-6. [Upgrading from 1.0.1 Release](#upgrading-from-101-release)
-7. [Development](#development)
+1. [Usage](#usage)
+1. [Limitations](#limitations)
+1. [Upgrading from 1.0.1 Release](#upgrading-from-101-release)
+1. [Development](#development)
 
 ## Overview
 
@@ -24,7 +28,8 @@ Manage [swap files](http://en.wikipedia.org/wiki/Paging) for your Linux environm
 
 ### What swap_file affects
 
-* Creating a swap-file on disk. This uses `dd` by default, but can use `fallocate` optionally for performance reasons. **Note: Using fallocate to create a ZFS file system will fail: https://bugzilla.redhat.com/show_bug.cgi?id=1129205**
+* Creating a swap-file on disk. This uses `dd` by default, but can use `fallocate` optionally for performance reasons.
+**Note: Using fallocate to create a ZFS file system will fail: <https://bugzilla.redhat.com/show_bug.cgi?id=1129205>**
 * Swapfiles on the system
 * Any mounts of swapfiles
 
@@ -73,7 +78,7 @@ swap_file::files { 'tmp file swap':
 
 To choose the size of the swap file instead of defaulting to memory size:
 
-```
+```puppet
 swap_file::files { '5GB Swap':
   ensure       => present,
   swapfile     => '/mnt/swap.5gb',
@@ -82,6 +87,7 @@ swap_file::files { '5GB Swap':
 ```
 
 ### hiera
+
 You can also use hiera to call this module and set the configuration.
 
 The simplest use of the module with hiera is this:
@@ -117,13 +123,14 @@ swap_file::files:
 ```
 
 This hiera config will respectively:
+
 * create a file `/tmp/swapfile.custom` using /bin/dd with the default size taken from the `$::memorysize` fact without creating a `mount` for it.
 * create a file `/tmp/swapfile.fallocate` using /usr/bin/fallocate with the default size taken from the `$::memorysize` fact and creating a `mount` for it.
 * deactivates the swapfile `/tmp/swapfile.old`, deletes it and removes the `mount`.
 
 Set `$files_hiera_merge` to `true` to merge all found instances of `swap_file::files` in Hiera. This is useful for specifying swap files at different levels of the hierachy and having them all included in the catalog.
 
-##Upgrading from 1.0.1 Release
+## Upgrading from 1.0.1 Release
 
 Previously you would create swapfiles with the `swap_file` class:
 
@@ -177,3 +184,9 @@ Right now there is no BSD support, but I'm planning on adding it in the future
 ## Development
 
 Follow the CONTRIBUTING guidelines! :)
+
+## Transfer Notice
+
+This project was originally authored by [Peter Souter](https://github.com/petems).
+The maintainer preferred that Vox Pupuli take ownership of the project for future improvement and maintenance.
+Existing pull requests and issues were transferred over, please fork and continue to contribute here.
