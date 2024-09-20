@@ -1,6 +1,6 @@
 {
   "name": "puppet-swap_file",
-  "version": "5.0.0",
+  "version": "5.0.1-rc0",
   "author": "Vox Pupuli",
   "summary": "Create swap files for Linux systems with Puppet",
   "license": "Apache-2.0",
