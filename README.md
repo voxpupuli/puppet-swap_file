@@ -1,7 +1,7 @@
 # swap_file
 
 [![CI](https://github.com/voxpupuli/puppet-swap_file/actions/workflows/ci.yml/badge.svg)](https://github.com/voxpupuli/puppet-swap_file/actions/workflows/ci.yml)
-[![License](https://img.shields.io/github/license/voxpupuli/puppet-swap_file.svg)](https://github.com/voxpupuli/puppet-swap_file/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/voxpupuli/puppet-swap_file.svg)](https://github.com/voxpupuli/puppet-swap_file/blob/master/LICENSE)
 [![puppetmodule.info docs](https://www.puppetmodule.info/images/badge.png)](https://www.puppetmodule.info/m/puppet-swap_file)
 [![Donated by petems](https://img.shields.io/badge/donated%20by-petems-fb7047.svg)](#transfer-notice)
 
