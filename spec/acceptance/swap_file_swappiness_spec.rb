@@ -2,7 +2,7 @@
 
 require 'spec_helper_acceptance'
 
-describe 'swap_file::swappiness class', unless: UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
+describe 'swap_file::swappiness class' do
   context 'swap_file::swappiness' do
     context 'swappiness => 75, permanent => false' do
       it 'works with no errors' do

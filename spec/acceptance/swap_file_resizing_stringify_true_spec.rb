@@ -2,7 +2,7 @@
 
 require 'spec_helper_acceptance'
 
-describe 'swap_file class', unless: UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
+describe 'swap_file class' do
   context 'swap_file' do
     context 'swapfilesize => 100' do
       it 'works with no errors' do
