@@ -20,7 +20,3 @@ jobs:
   puppet:
     name: Puppet
     uses: voxpupuli/gha-puppet/.github/workflows/beaker.yml@v3
-    with:
-      pidfile_workaround: 'false'
-      beaker_facter: 'memory.system.total:TotalMemory:100 MiB'
-      beaker_hypervisor:  'vagrant_libvirt'
