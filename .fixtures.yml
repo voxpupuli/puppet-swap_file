@@ -1,12 +1,7 @@
+---
 fixtures:
   repositories:
-    stdlib:
-      repo: "https://github.com/puppetlabs/puppetlabs-stdlib.git"
-    augeasproviders_sysctl:
-      repo: "https://github.com/voxpupuli/puppet-augeasproviders_sysctl.git"
-    augeasproviders_core:
-      repo: "https://github.com/voxpupuli/puppet-augeasproviders_core.git"
-    mount_core:
-      repo: "https://github.com/puppetlabs/puppetlabs-mount_core.git"
-  symlinks:
-    swap_file: "#{source_dir}"
+    augeasproviders_core: https://github.com/voxpupuli/puppet-augeasproviders_core.git
+    augeasproviders_sysctl: https://github.com/voxpupuli/puppet-augeasproviders_sysctl.git
+    mount_core: https://github.com/puppetlabs/puppetlabs-mount_core.git
+    stdlib: https://github.com/puppetlabs/puppetlabs-stdlib.git
