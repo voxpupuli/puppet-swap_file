@@ -12,7 +12,7 @@ require 'voxpupuli/test/spec_helper'
 RSpec.configure do |c|
   c.facterdb_string_keys = false
   c.hiera_config = 'spec/fixtures/hiera/hiera.yaml'
-  c.mock_with :mocha
+  c.mock_with :rspec
 end
 
 add_mocked_facts!

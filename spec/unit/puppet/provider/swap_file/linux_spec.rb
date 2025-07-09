@@ -44,8 +44,8 @@ describe Puppet::Type.type(:swap_file).provider(:linux) do
   }
 
   before do
-    Facter.stubs(:value).with(:kernel).returns('Linux')
-    provider.class.stubs(:swapon).with(['-s']).returns(swapon_s_output)
+    allow(Facter).to receive(:value).with(:kernel).and_return('Linux')
+    allow(provider.class).to receive(:swapon).with(['-s']).and_return(swapon_s_output)
   end
 
   describe 'self.prefetch' do
@@ -80,15 +80,15 @@ describe Puppet::Type.type(:swap_file).provider(:linux) do
 
   describe 'create_swap_file' do
     it 'runs mkswap and swapon' do
-      provider.stubs(:mkswap).returns(mkswap_return)
-      provider.stubs(:swapon).returns('')
+      allow(provider).to receive(:mkswap).and_return(mkswap_return)
+      allow(provider).to receive(:swapon).and_return('')
       provider.create_swap_file('/tmp/swap')
     end
   end
 
   describe 'swap_off' do
     it 'runs swapoff and returns the log of the command' do
-      provider.stubs(:swapoff).returns('')
+      allow(provider).to receive(:swapoff).and_return('')
       provider.swap_off('/tmp/swap')
     end
   end
