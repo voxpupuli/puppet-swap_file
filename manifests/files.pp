@@ -120,7 +120,7 @@ define swap_file::files (
   }
   elsif $ensure == 'absent' {
     swap_file { $swapfile:
-      ensure  => 'absent',
+      ensure => 'absent',
     }
     file { $swapfile:
       ensure  => absent,
