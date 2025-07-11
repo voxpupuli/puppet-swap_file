@@ -1,7 +1,7 @@
 ---
 spec/spec_helper.rb:
   hiera_config: "'spec/fixtures/hiera/hiera.yaml'"
-  mock_with: ':mocha'
+  mock_with: ':rspec'
 
 spec/spec_helper_acceptance.rb:
   unmanaged: false

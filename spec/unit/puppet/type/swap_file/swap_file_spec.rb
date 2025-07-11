@@ -8,9 +8,8 @@ describe Puppet::Type.type(:swap_file) do
     @class = described_class
     @provider_class = @class.provide(:fake) { mk_resource_methods } # rubocop:todo RSpec/InstanceVariable
     @provider = @provider_class.new # rubocop:todo RSpec/InstanceVariable
-    @resource = stub 'resource', resource: nil, provider: @provider # rubocop:todo RSpec/InstanceVariable
 
-    @class.stubs(:defaultprovider).returns @provider_class # rubocop:todo RSpec/InstanceVariable
+    allow(@class).to receive(:defaultprovider).and_return(@provider_class) # rubocop:todo RSpec/InstanceVariable
   end
 
   it 'has :name as its keyattribute' do
