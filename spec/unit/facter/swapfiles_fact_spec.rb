@@ -20,13 +20,13 @@ describe Facter::Util::Fact do
           Filename        Type    Size  Used  Priority
           /dev/dm-1                               partition 524284  0 -1
           /mnt/swap.1                             file      204796  0 -2
-          /tmp/swapfile.fallocate                 file      204796  0 -3
+          /mnt/swapfile.fallocate                 file      204796  0 -3
         EOS
         allow(Facter::Util::Resolution).to receive(:exec).with('cat /proc/swaps').and_return(proc_swap_output)
         expect(Facter.value(:swapfile_sizes)).to eq(
           {
             '/mnt/swap.1' => '204796',
-            '/tmp/swapfile.fallocate' => '204796'
+            '/mnt/swapfile.fallocate' => '204796'
           }
         )
       end

@@ -9,7 +9,7 @@ describe 'swap_file::files defined type' do
         pp = <<-EOS
         swap_file::files { 'tmp file swap':
           ensure   => present,
-          swapfile => '/tmp/swapfile',
+          swapfile => '/mnt/swapfile',
         }
         EOS
 
@@ -21,12 +21,12 @@ describe 'swap_file::files defined type' do
         if ['FreeBSD'].include?(fact('os.family'))
           shell('/usr/sbin/swapinfo | grep /dev/md99', acceptable_exit_codes: [0])
         else
-          shell('/sbin/swapon -s | grep /tmp/swapfile', acceptable_exit_codes: [0])
+          shell('/sbin/swapon -s | grep /mnt/swapfile', acceptable_exit_codes: [0])
         end
       end
 
       it 'contains the given fstab setting' do
-        shell('cat /etc/fstab | grep /tmp/swapfile', acceptable_exit_codes: [0])
+        shell('cat /etc/fstab | grep /mnt/swapfile', acceptable_exit_codes: [0])
         if ['FreeBSD'].include?(fact('os.family'))
           shell('cat /etc/fstab | grep md99', acceptable_exit_codes: [0])
         else

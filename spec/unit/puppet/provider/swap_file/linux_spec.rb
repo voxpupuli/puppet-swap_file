@@ -6,7 +6,7 @@ describe Puppet::Type.type(:swap_file).provider(:linux) do
   let(:resource) do
     Puppet::Type.type(:swap_file).new(
       {
-        name: '/tmp/swap',
+        name: '/mnt/swap',
         size: '1024',
         provider: described_class.name
       }
@@ -82,14 +82,14 @@ describe Puppet::Type.type(:swap_file).provider(:linux) do
     it 'runs mkswap and swapon' do
       allow(provider).to receive(:mkswap).and_return(mkswap_return)
       allow(provider).to receive(:swapon).and_return('')
-      provider.create_swap_file('/tmp/swap')
+      provider.create_swap_file('/mnt/swap')
     end
   end
 
   describe 'swap_off' do
     it 'runs swapoff and returns the log of the command' do
       allow(provider).to receive(:swapoff).and_return('')
-      provider.swap_off('/tmp/swap')
+      provider.swap_off('/mnt/swap')
     end
   end
 end
