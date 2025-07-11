@@ -8,12 +8,12 @@ describe 'swap_file::files defined type' do
       pp = <<-EOS
       swap_file::files { 'tmp file swap 1':
       ensure   => present,
-        swapfile => '/tmp/swapfile1',
+        swapfile => '/mnt/swapfile1',
       }
 
       swap_file::files { 'tmp file swap 2':
       ensure   => present,
-        swapfile => '/tmp/swapfile2',
+        swapfile => '/mnt/swapfile2',
       }
       EOS
 
@@ -22,13 +22,13 @@ describe 'swap_file::files defined type' do
     end
 
     it 'contains the given swapfile' do
-      shell('/sbin/swapon -s | grep /tmp/swapfile1', acceptable_exit_codes: [0])
-      shell('/sbin/swapon -s | grep /tmp/swapfile2', acceptable_exit_codes: [0])
+      shell('/sbin/swapon -s | grep /mnt/swapfile1', acceptable_exit_codes: [0])
+      shell('/sbin/swapon -s | grep /mnt/swapfile2', acceptable_exit_codes: [0])
     end
 
     it 'contains the default fstab setting' do
-      shell('cat /etc/fstab | grep /tmp/swapfile1', acceptable_exit_codes: [0])
-      shell('cat /etc/fstab | grep /tmp/swapfile2', acceptable_exit_codes: [0])
+      shell('cat /etc/fstab | grep /mnt/swapfile1', acceptable_exit_codes: [0])
+      shell('cat /etc/fstab | grep /mnt/swapfile2', acceptable_exit_codes: [0])
     end
   end
 end

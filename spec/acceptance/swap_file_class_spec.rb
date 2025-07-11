@@ -13,12 +13,12 @@ describe 'swap_file class' do
               ensure => 'present',
             },
             'use fallocate' => {
-              swapfile => '/tmp/swapfile.fallocate',
+              swapfile => '/mnt/swapfile.fallocate',
               cmd      => 'fallocate',
             },
             'remove swap file' => {
               ensure   => 'absent',
-              swapfile => '/tmp/swapfile.old',
+              swapfile => '/mnt/swapfile.old',
             },
           },
         }
@@ -39,11 +39,11 @@ describe 'swap_file class' do
       end
 
       it 'contains the default swapfile' do
-        shell('/sbin/swapon -s | grep /tmp/swapfile.fallocate', acceptable_exit_codes: [0])
+        shell('/sbin/swapon -s | grep /mnt/swapfile.fallocate', acceptable_exit_codes: [0])
       end
 
       it 'contains the default fstab setting' do
-        shell('cat /etc/fstab | grep /tmp/swapfile.fallocate', acceptable_exit_codes: [0])
+        shell('cat /etc/fstab | grep /mnt/swapfile.fallocate', acceptable_exit_codes: [0])
       end
     end
   end
