@@ -1,4 +1,9 @@
 ---
+Gemfile:
+  optional:
+    ':test':
+      - gem: 'mocha'
+
 spec/spec_helper.rb:
   hiera_config: "'spec/fixtures/hiera/hiera.yaml'"
   mock_with: ':rspec'
