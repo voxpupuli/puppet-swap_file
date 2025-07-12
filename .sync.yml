@@ -9,4 +9,4 @@ spec/spec_helper_acceptance.rb:
 # Minimum size that mkswap will accept is 40MB.
 .github/workflows/ci.yml:
   beaker_hypervisor: vagrant_libvirt
-  beaker_facter: 'memory.system.total:TotalMemory:100 MiB'
+  beaker_facter: 'memory.system.total:TotalMemory:300 MiB'
