@@ -12,8 +12,8 @@ describe 'swap_file::files' do
                          memory: {
                            system: {
                              total: '1.00 GB',
-                           }
-                         }
+                           },
+                         },
                        })
       end
 
@@ -27,17 +27,17 @@ describe 'swap_file::files' do
         end
 
         it do
-          is_expected.to contain_exec('Create swap file /mnt/swap.1').
-            with('command' => '/bin/dd if=/dev/zero of=/mnt/swap.1 bs=1M count=1024',
-                 'creates' => '/mnt/swap.1')
+          is_expected.to contain_exec('Create swap file /mnt/swap.1')
+            .with('command' => '/bin/dd if=/dev/zero of=/mnt/swap.1 bs=1M count=1024',
+                  'creates' => '/mnt/swap.1')
         end
 
         it do
-          is_expected.to contain_file('/mnt/swap.1').
-            with('owner' => 'root',
-                 'group' => 'root',
-                 'mode' => '0600',
-                 'require' => 'Exec[Create swap file /mnt/swap.1]')
+          is_expected.to contain_file('/mnt/swap.1')
+            .with('owner' => 'root',
+                  'group' => 'root',
+                  'mode' => '0600',
+                  'require' => 'Exec[Create swap file /mnt/swap.1]')
         end
 
         it do
@@ -45,15 +45,15 @@ describe 'swap_file::files' do
         end
 
         it do
-          is_expected.to contain_mount('/mnt/swap.1').
-            with('require' => 'Swap_file[/mnt/swap.1]')
+          is_expected.to contain_mount('/mnt/swap.1')
+            .with('require' => 'Swap_file[/mnt/swap.1]')
         end
       end
 
       context 'custom swapfilesize parameter' do
         let(:params) do
           {
-            swapfilesize: '4.1 GB'
+            swapfilesize: '4.1 GB',
           }
         end
 
@@ -62,9 +62,9 @@ describe 'swap_file::files' do
         end
 
         it do
-          is_expected.to contain_exec('Create swap file /mnt/swap.1').
-            with('command' => '/bin/dd if=/dev/zero of=/mnt/swap.1 bs=1M count=4198',
-                 'creates' => '/mnt/swap.1')
+          is_expected.to contain_exec('Create swap file /mnt/swap.1')
+            .with('command' => '/bin/dd if=/dev/zero of=/mnt/swap.1 bs=1M count=4198',
+                  'creates' => '/mnt/swap.1')
         end
       end
 
@@ -73,7 +73,7 @@ describe 'swap_file::files' do
           {
             swapfile: '/mnt/swap.2',
             swapfilesize: '4.1 GB',
-            timeout: 900
+            timeout: 900,
           }
         end
 
@@ -82,9 +82,9 @@ describe 'swap_file::files' do
         end
 
         it do
-          is_expected.to contain_exec('Create swap file /mnt/swap.2').
-            with('command' => '/bin/dd if=/dev/zero of=/mnt/swap.2 bs=1M count=4198',
-                 'timeout' => 900, 'creates' => '/mnt/swap.2')
+          is_expected.to contain_exec('Create swap file /mnt/swap.2')
+            .with('command' => '/bin/dd if=/dev/zero of=/mnt/swap.2 bs=1M count=4198',
+                  'timeout' => 900, 'creates' => '/mnt/swap.2')
         end
       end
 
@@ -93,7 +93,7 @@ describe 'swap_file::files' do
           {
             swapfile: '/mnt/swap.2',
             swapfilesize: '4.1 GB',
-            timeout: 900
+            timeout: 900,
           }
         end
 
@@ -102,9 +102,9 @@ describe 'swap_file::files' do
         end
 
         it do
-          is_expected.to contain_exec('Create swap file /mnt/swap.2').
-            with('command' => '/bin/dd if=/dev/zero of=/mnt/swap.2 bs=1M count=4198',
-                 'timeout' => 900, 'creates' => '/mnt/swap.2')
+          is_expected.to contain_exec('Create swap file /mnt/swap.2')
+            .with('command' => '/bin/dd if=/dev/zero of=/mnt/swap.2 bs=1M count=4198',
+                  'timeout' => 900, 'creates' => '/mnt/swap.2')
         end
       end
 
@@ -113,16 +113,16 @@ describe 'swap_file::files' do
           { # rubocop:todo Lint/Void
             swapfile: '/mnt/swap.3',
             swapfilesize: '4.1 GB',
-            cmd: 'fallocate'
+            cmd: 'fallocate',
           }
           it do
             is_expected.to compile.with_all_deps
           end
 
-          is_expected.to contain_exec('Create swap file /mnt/swap.3').
-            with(
+          is_expected.to contain_exec('Create swap file /mnt/swap.3')
+            .with(
               'command' => '/usr/bin/fallocate -l 4198M /mnt/swap.3',
-              'creates' => '/mnt/swap.3'
+              'creates' => '/mnt/swap.3',
             )
         end
       end
@@ -130,7 +130,7 @@ describe 'swap_file::files' do
       context 'with cmd set to invalid value' do
         let(:params) do
           {
-            cmd: 'invalid'
+            cmd: 'invalid',
           }
         end
 
@@ -146,7 +146,7 @@ describe 'swap_file::files' do
           let(:params) do
             {
               swapfile: '/mnt/swap.resizeme',
-              resize_existing: true
+              resize_existing: true,
             }
           end
 
@@ -155,7 +155,7 @@ describe 'swap_file::files' do
                             swapfile_sizes: {
                               '/mnt/swap.resizeme' => existing_swap_kb,
                             },
-                            swapfiles_sizes_csv: "/mnt/swap.resizeme||#{existing_swap_kb}"
+                            swapfiles_sizes_csv: "/mnt/swap.resizeme||#{existing_swap_kb}",
                           })
           end
 
@@ -172,27 +172,27 @@ describe 'swap_file::files' do
           end
 
           it do
-            is_expected.to contain_exec('Create swap file /mnt/swap.resizeme').
-              with('command' => '/bin/dd if=/dev/zero of=/mnt/swap.resizeme bs=1M count=1024',
-                   'creates' => '/mnt/swap.resizeme')
+            is_expected.to contain_exec('Create swap file /mnt/swap.resizeme')
+              .with('command' => '/bin/dd if=/dev/zero of=/mnt/swap.resizeme bs=1M count=1024',
+                    'creates' => '/mnt/swap.resizeme')
           end
 
           it do
-            is_expected.to contain_file('/mnt/swap.resizeme').
-              with('owner' => 'root',
-                   'group' => 'root',
-                   'mode' => '0600',
-                   'require' => 'Exec[Create swap file /mnt/swap.resizeme]')
+            is_expected.to contain_file('/mnt/swap.resizeme')
+              .with('owner' => 'root',
+                    'group' => 'root',
+                    'mode' => '0600',
+                    'require' => 'Exec[Create swap file /mnt/swap.resizeme]')
           end
 
           it do
-            is_expected.to contain_swap_file('/mnt/swap.resizeme').
-              with('ensure' => 'present')
+            is_expected.to contain_swap_file('/mnt/swap.resizeme')
+              .with('ensure' => 'present')
           end
 
           it do
-            is_expected.to contain_mount('/mnt/swap.resizeme').
-              with('require' => 'Swap_file[/mnt/swap.resizeme]')
+            is_expected.to contain_mount('/mnt/swap.resizeme')
+              .with('require' => 'Swap_file[/mnt/swap.resizeme]')
           end
         end
 
@@ -200,7 +200,7 @@ describe 'swap_file::files' do
           let(:params) do
             {
               swapfile: '/mnt/swap.nofact',
-              resize_existing: true
+              resize_existing: true,
             }
           end
           let(:facts) do
@@ -220,7 +220,7 @@ describe 'swap_file::files' do
           let(:params) do
             {
               swapfile: '/mnt/swap.factbutnomatch',
-              resize_existing: true
+              resize_existing: true,
             }
           end
           let(:facts) do
@@ -238,10 +238,10 @@ describe 'swap_file::files' do
           end
 
           it do
-            is_expected.to contain_exec('Create swap file /mnt/swap.factbutnomatch').
-              with(
+            is_expected.to contain_exec('Create swap file /mnt/swap.factbutnomatch')
+              .with(
                 'command' => '/bin/dd if=/dev/zero of=/mnt/swap.factbutnomatch bs=1M count=1024',
-                'creates' => '/mnt/swap.factbutnomatch'
+                'creates' => '/mnt/swap.factbutnomatch',
               )
           end
 
@@ -254,7 +254,7 @@ describe 'swap_file::files' do
           let(:params) do
             {
               swapfile: '/mnt/swap.resizeme',
-              resize_existing: true
+              resize_existing: true,
             }
           end
 
@@ -280,27 +280,27 @@ describe 'swap_file::files' do
           end
 
           it do
-            is_expected.to contain_exec('Create swap file /mnt/swap.resizeme').
-              with('command' => '/bin/dd if=/dev/zero of=/mnt/swap.resizeme bs=1M count=1024',
-                   'creates' => '/mnt/swap.resizeme')
+            is_expected.to contain_exec('Create swap file /mnt/swap.resizeme')
+              .with('command' => '/bin/dd if=/dev/zero of=/mnt/swap.resizeme bs=1M count=1024',
+                    'creates' => '/mnt/swap.resizeme')
           end
 
           it do
-            is_expected.to contain_file('/mnt/swap.resizeme').
-              with('owner' => 'root',
-                   'group' => 'root',
-                   'mode' => '0600',
-                   'require' => 'Exec[Create swap file /mnt/swap.resizeme]')
+            is_expected.to contain_file('/mnt/swap.resizeme')
+              .with('owner' => 'root',
+                    'group' => 'root',
+                    'mode' => '0600',
+                    'require' => 'Exec[Create swap file /mnt/swap.resizeme]')
           end
 
           it do
-            is_expected.to contain_swap_file('/mnt/swap.resizeme').
-              with('ensure' => 'present')
+            is_expected.to contain_swap_file('/mnt/swap.resizeme')
+              .with('ensure' => 'present')
           end
 
           it do
-            is_expected.to contain_mount('/mnt/swap.resizeme').
-              with('require' => 'Swap_file[/mnt/swap.resizeme]')
+            is_expected.to contain_mount('/mnt/swap.resizeme')
+              .with('require' => 'Swap_file[/mnt/swap.resizeme]')
           end
         end
 
@@ -308,7 +308,7 @@ describe 'swap_file::files' do
           let(:params) do
             {
               swapfile: '/mnt/swap.nofact',
-              resize_existing: true
+              resize_existing: true,
             }
           end
           let(:facts) do
@@ -327,11 +327,11 @@ describe 'swap_file::files' do
           end
         end
 
-        context 'when swapfile_sizes fact exits but file does not match' do  # rubocop:todo RSpec/RepeatedExampleGroupDescription
+        context 'when swapfile_sizes fact exits but file does not match' do # rubocop:todo RSpec/RepeatedExampleGroupDescription
           let(:params) do
             {
               swapfile: '/mnt/swap.factbutnomatch',
-              resize_existing: true
+              resize_existing: true,
             }
           end
           let(:facts) do
@@ -346,10 +346,10 @@ describe 'swap_file::files' do
           end
 
           it do
-            is_expected.to contain_exec('Create swap file /mnt/swap.factbutnomatch').
-              with(
+            is_expected.to contain_exec('Create swap file /mnt/swap.factbutnomatch')
+              .with(
                 'command' => '/bin/dd if=/dev/zero of=/mnt/swap.factbutnomatch bs=1M count=1024',
-                'creates' => '/mnt/swap.factbutnomatch'
+                'creates' => '/mnt/swap.factbutnomatch',
               )
           end
 

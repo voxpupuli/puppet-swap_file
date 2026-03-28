@@ -8,8 +8,8 @@ describe Puppet::Type.type(:swap_file).provider(:linux) do
       {
         name: '/mnt/swap',
         size: '1024',
-        provider: described_class.name
-      }
+        provider: described_class.name,
+      },
     )
   end
 

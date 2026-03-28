@@ -9,7 +9,7 @@ describe 'swap_file' do
                          memory: {
                            system: {
                              total: '1.00 GB',
-                           }
+                           },
                          },
                          parameter_tests: '', # Default so hiera does not fail.
                        })
@@ -31,7 +31,7 @@ describe 'swap_file' do
               'test' => {
                 'swapfile' => '/mnt/test',
               },
-            }
+            },
           }
         end
 
@@ -59,7 +59,7 @@ describe 'swap_file' do
             {
               fqdn:            'files',
               parameter_tests: 'files_hiera_merge',
-            }
+            },
           )
         end
 
@@ -138,7 +138,7 @@ describe 'swap_file' do
           var[:name].each do |var_name|
             var[:valid].each do |valid|
               context "with #{var_name} (#{type}) set to valid #{valid} (as #{valid.class})" do
-                let(:params) { validation_params.merge({ "#{var_name}": valid, }) }
+                let(:params) { validation_params.merge({ "#{var_name}": valid }) }
 
                 it { is_expected.to compile }
               end
@@ -146,7 +146,7 @@ describe 'swap_file' do
 
             var[:invalid].each do |invalid|
               context "with #{var_name} (#{type}) set to invalid #{invalid} (as #{invalid.class})" do
-                let(:params) { validation_params.merge({ "#{var_name}": invalid, }) }
+                let(:params) { validation_params.merge({ "#{var_name}": invalid }) }
 
                 it 'fails' do
                   expect do
