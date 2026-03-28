@@ -33,20 +33,20 @@ describe 'swap_file::resize' do
     end
 
     it do
-      is_expected.to contain_exec('Detach swap file /mnt/swap.1 for resize').
-        with(
+      is_expected.to contain_exec('Detach swap file /mnt/swap.1 for resize')
+        .with(
           {
             'command' => '/sbin/swapoff /mnt/swap.1',
-            'onlyif' => '/sbin/swapon -s | grep /mnt/swap.1'
-          }
+            'onlyif' => '/sbin/swapon -s | grep /mnt/swap.1',
+          },
         )
 
-      is_expected.to contain_exec('Purge /mnt/swap.1 for resize').
-        with(
+      is_expected.to contain_exec('Purge /mnt/swap.1 for resize')
+        .with(
           {
             'command' => '/bin/rm -f /mnt/swap.1',
-            'onlyif' => 'test -f /mnt/swap.1'
-          }
+            'onlyif' => 'test -f /mnt/swap.1',
+          },
         )
     end
   end

@@ -26,8 +26,8 @@ describe Facter::Util::Fact do
         expect(Facter.value(:swapfile_sizes)).to eq(
           {
             '/mnt/swap.1' => '204796',
-            '/mnt/swapfile.fallocate' => '204796'
-          }
+            '/mnt/swapfile.fallocate' => '204796',
+          },
         )
       end
     end

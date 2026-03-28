@@ -11,7 +11,7 @@ Puppet::Type.type(:swap_file).provide(:linux) do
   mk_resource_methods
 
   def initialize(value = {})
-    super(value)
+    super
     @property_flush = {}
   end
 
@@ -52,7 +52,7 @@ Puppet::Type.type(:swap_file).provide(:linux) do
       type: output_array[1],
       size: output_array[2],
       used: output_array[3],
-      priority: output_array[4]
+      priority: output_array[4],
     }
 
     swapfile_properties[:provider] = :swap_file

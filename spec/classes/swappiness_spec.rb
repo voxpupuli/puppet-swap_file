@@ -10,8 +10,8 @@ describe 'swap_file::swappiness' do
   end
 
   it do
-    is_expected.to contain_sysctl('vm.swappiness').
-      with({ 'ensure' => 'present',
-             'value' => '65' })
+    is_expected.to contain_sysctl('vm.swappiness')
+      .with({ 'ensure' => 'present',
+              'value' => '65', })
   end
 end
