@@ -3,7 +3,7 @@
 if File.exist?('/proc/swaps')
   swap_file_array = []
 
-  swap_file_output = Facter::Util::Resolution.exec('cat /proc/swaps')
+  swap_file_output = Facter::Core::Execution.execute('cat /proc/swaps')
 
   # Sample Output
   # Filename                                Type    Size  Used  Priority
