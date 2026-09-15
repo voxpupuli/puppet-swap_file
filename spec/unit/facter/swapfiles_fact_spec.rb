@@ -12,7 +12,7 @@ describe Facter::Util::Fact do
       before do
         allow(Facter.fact(:kernel)).to receive(:value).and_return('Linux')
         allow(File).to receive(:exist?).with('/proc/swaps').and_return(true)
-        allow(Facter::Util::Resolution).to receive(:exec)
+        allow(Facter::Core::Execution).to receive(:execute)
       end
 
       it do
@@ -22,7 +22,7 @@ describe Facter::Util::Fact do
           /mnt/swap.1                             file      204796  0 -2
           /mnt/swapfile.fallocate                 file      204796  0 -3
         EOS
-        allow(Facter::Util::Resolution).to receive(:exec).with('cat /proc/swaps').and_return(proc_swap_output)
+        allow(Facter::Core::Execution).to receive(:execute).with('cat /proc/swaps').and_return(proc_swap_output)
         expect(Facter.value(:swapfile_sizes)).to eq(
           {
             '/mnt/swap.1' => '204796',
