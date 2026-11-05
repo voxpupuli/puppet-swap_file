@@ -270,7 +270,7 @@ A defined type to resize an existing swapfile
 
 #### Examples
 
-##### 
+#####
 
 ```puppet
 ::swap_file::resize { '/mnt/swap.1:
@@ -445,4 +445,3 @@ Would return: 1019900
 Would return: false
 
 Returns: `Any`
-
