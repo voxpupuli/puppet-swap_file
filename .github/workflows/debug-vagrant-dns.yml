@@ -26,7 +26,7 @@ jobs:
       matrix:
         box:
           - '4.3.12'
-          - '4.3.11'
+          - '4.3.10'
     env:
       LIBVIRT_DEFAULT_URI: qemu:///system
       VAGRANT_DEFAULT_PROVIDER: libvirt
@@ -87,15 +87,22 @@ jobs:
             sudo rm -f /etc/resolv.conf;
             sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf' 2>&1 | tail -40
 
-      - name: Test resolvectl DNS override
+      - name: Diagnose systemd-resolved stub
         run: |
           cd "/tmp/vagrant-dns-${{ matrix.box }}"
           vagrant ssh -c '
-            sudo resolvectl dns eth0 1.1.1.1 9.9.9.9;
+            set -x;
+            date -u;
+            timedatectl || true;
+            resolvectl query example.com || true;
+            resolvectl query google.com || true;
+            resolvectl query apt.voxpupuli.org || true;
+            sudo resolvectl statistics | head -20 || true;
+            echo "=== dnssec off on eth0 ===";
+            sudo resolvectl dnssec eth0 no;
             sudo resolvectl flush-caches;
-            resolvectl dns;
-            getent hosts apt.voxpupuli.org || echo GETENT_FAIL;
-            timeout 15 wget -q -O /dev/null https://apt.voxpupuli.org/ && echo WGET_OK || echo WGET_FAIL' 2>&1 | tail -20
+            getent hosts apt.voxpupuli.org || echo GETENT_FAIL_NO_DNSSEC;
+            timeout 15 wget -q -O /dev/null https://apt.voxpupuli.org/ && echo WGET_OK_NO_DNSSEC || echo WGET_FAIL_NO_DNSSEC' 2>&1 | tail -60
 
       - name: Destroy guest
         if: always()
