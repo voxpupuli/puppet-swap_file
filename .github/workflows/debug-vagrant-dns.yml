@@ -1,7 +1,7 @@
 ---
 # Temporary diagnostics for acceptance failures on Ubuntu 22.04 guests.
 # Reproduces the libvirt + dnsmasq setup used by voxpupuli/gha-puppet and
-# dumps DNS state on the runner and inside the guest.
+# inspects guest DNS. Matrix compares box versions to spot regressions.
 # Delete this file once the root cause is fixed upstream.
 
 name: Debug vagrant guest DNS
@@ -17,10 +17,16 @@ permissions:
   contents: read
 
 jobs:
-  debug:
-    name: libvirt DNS diagnostics
+  dns:
+    name: ubuntu2204 box ${{ matrix.box }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        box:
+          - '4.3.12'
+          - '4.3.11'
     env:
       LIBVIRT_DEFAULT_URI: qemu:///system
       VAGRANT_DEFAULT_PROVIDER: libvirt
@@ -39,82 +45,60 @@ jobs:
 
       - name: Dump runner state
         run: |
-          echo "::group::runner image"
-          cat /etc/os-release
-          uname -a
-          echo "::endgroup::"
-
           echo "::group::dnsmasq packages"
           apt-cache policy dnsmasq dnsmasq-base || true
-          systemctl is-enabled dnsmasq || true
-          systemctl is-active dnsmasq || true
-          systemctl status dnsmasq --no-pager || true
           echo "::endgroup::"
-
-          echo "::group::port 53 listeners"
-          sudo ss -lunp | grep ':53' || true
-          echo "::endgroup::"
-
-          echo "::group::host resolver"
-          cat /etc/resolv.conf || true
-          resolvectl status || true
-          echo "::endgroup::"
-
           echo "::group::libvirt default network"
-          sudo systemctl status libvirtd --no-pager || true
-          sudo virsh net-list --all || true
           sudo virsh net-dumpxml default || true
+          echo "::endgroup::"
+          echo "::group::libvirt dnsmasq upstream"
+          sudo journalctl -u libvirtd --no-pager --since '-5 min' | grep -i -E 'dnsmasq|nameserver' || true
           echo "::endgroup::"
 
       - name: Boot guest
-        working-directory: /tmp
         run: |
-          mkdir -p vagrant-dns
-          cd vagrant-dns
-          vagrant init generic/ubuntu2204
+          mkdir -p "/tmp/vagrant-dns-${{ matrix.box }}"
+          cd "/tmp/vagrant-dns-${{ matrix.box }}"
+          vagrant init generic/ubuntu2204 --box-version "${{ matrix.box }}"
           vagrant box list
           time vagrant up --provider=libvirt --no-tty
 
-      - name: Dump host and libvirt state after boot
-        working-directory: /tmp/vagrant-dns
+      - name: Dump guest DNS configuration
         run: |
-          echo "::group::dhcp leases"
-          sudo virsh net-dhcp-leases default || true
-          sudo virsh list --all || true
-          echo "::endgroup::"
-
-          echo "::group::port 53 listeners"
-          sudo ss -lunp | grep ':53' || true
-          echo "::endgroup::"
-
-          echo "::group::libvirt dnsmasq processes"
-          ps aux | grep -i '[d]nsmasq' || true
-          sudo journalctl -u libvirtd --no-pager --since '-15 min' | grep -i -E 'dnsmasq|dns|firewall|bind' || true
-          echo "::endgroup::"
-
-      - name: Dump guest DNS state
-        working-directory: /tmp/vagrant-dns
-        run: |
+          cd "/tmp/vagrant-dns-${{ matrix.box }}"
           vagrant ssh -c 'set -x;
+            ls -l /etc/resolv.conf;
             cat /etc/resolv.conf;
-            resolvectl status || true;
-            ip -4 addr;
-            ip route;
-            getent hosts apt.voxpupuli.org || true;
-            timeout 10 wget -q -O /dev/null https://apt.voxpupuli.org/ && echo WGET_OK || echo WGET_FAIL;
-            cat /etc/hosts' || true
+            sudo ls /etc/netplan;
+            sudo cat /etc/netplan/*.yaml || true;
+            resolvectl status;
+            resolvectl dns;
+            getent hosts apt.voxpupuli.org || echo GETENT_FAIL' 2>&1 | tail -80
 
-      - name: Test static DNS workaround in guest
-        working-directory: /tmp/vagrant-dns
+      - name: Probe each resolver from the guest
         run: |
-          vagrant ssh -c '
+          cd "/tmp/vagrant-dns-${{ matrix.box }}"
+          vagrant ssh -c 'set -x;
+            for s in 4.2.2.1 4.2.2.2 208.67.220.220 192.168.121.1 1.1.1.1 9.9.9.9; do
+              sudo sh -c "printf \"nameserver $s\n\" > /etc/resolv.conf";
+              printf "%s => " "$s";
+              timeout 5 getent hosts apt.voxpupuli.org >/dev/null 2>&1 && echo OK || echo FAIL;
+            done;
             sudo rm -f /etc/resolv.conf;
-            printf "nameserver 1.1.1.1\nnameserver 9.9.9.9\n" | sudo tee /etc/resolv.conf;
-            cat /etc/resolv.conf;
-            getent hosts apt.voxpupuli.org;
-            timeout 15 wget -q -O /dev/null https://apt.voxpupuli.org/ && echo WGET_OK_WITH_STATIC_DNS || echo WGET_FAIL_WITH_STATIC_DNS' || true
+            sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf' 2>&1 | tail -40
+
+      - name: Test resolvectl DNS override
+        run: |
+          cd "/tmp/vagrant-dns-${{ matrix.box }}"
+          vagrant ssh -c '
+            sudo resolvectl dns eth0 1.1.1.1 9.9.9.9;
+            sudo resolvectl flush-caches;
+            resolvectl dns;
+            getent hosts apt.voxpupuli.org || echo GETENT_FAIL;
+            timeout 15 wget -q -O /dev/null https://apt.voxpupuli.org/ && echo WGET_OK || echo WGET_FAIL' 2>&1 | tail -20
 
       - name: Destroy guest
         if: always()
-        working-directory: /tmp/vagrant-dns
-        run: vagrant destroy -f || true
+        run: |
+          cd "/tmp/vagrant-dns-${{ matrix.box }}"
+          vagrant destroy -f || true
