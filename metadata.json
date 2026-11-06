@@ -53,7 +53,7 @@
   "dependencies": [
     {
       "name": "puppetlabs/stdlib",
-      "version_requirement": ">= 4.23.0 < 10.0.0"
+      "version_requirement": ">= 4.23.0 < 11.0.0"
     },
     {
       "name": "puppetlabs/mount_core",
