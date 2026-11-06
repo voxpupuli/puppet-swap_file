@@ -1,0 +1,117 @@
+---
+# Temporary diagnostics for acceptance failures on Ubuntu 22.04 guests.
+# Reproduces the libvirt + dnsmasq setup used by voxpupuli/gha-puppet and
+# dumps DNS state on the runner and inside the guest.
+# Delete this file once the root cause is fixed upstream.
+
+name: Debug vagrant guest DNS
+
+# yamllint disable-line rule:truthy
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  debug:
+    name: libvirt DNS diagnostics
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      LIBVIRT_DEFAULT_URI: qemu:///system
+      VAGRANT_DEFAULT_PROVIDER: libvirt
+      VAGRANT_NO_COLOR: '1'
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup libvirt for Vagrant
+        run: |
+          sudo add-apt-repository -y ppa:evgeni/vagrant
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            vagrant vagrant-libvirt libvirt-daemon-system libvirt-daemon \
+            qemu-system-x86 qemu-utils dnsmasq
+          sudo chmod 666 /var/run/libvirt/libvirt-sock
+
+      - name: Dump runner state
+        run: |
+          echo "::group::runner image"
+          cat /etc/os-release
+          uname -a
+          echo "::endgroup::"
+
+          echo "::group::dnsmasq packages"
+          apt-cache policy dnsmasq dnsmasq-base || true
+          systemctl is-enabled dnsmasq || true
+          systemctl is-active dnsmasq || true
+          systemctl status dnsmasq --no-pager || true
+          echo "::endgroup::"
+
+          echo "::group::port 53 listeners"
+          sudo ss -lunp | grep ':53' || true
+          echo "::endgroup::"
+
+          echo "::group::host resolver"
+          cat /etc/resolv.conf || true
+          resolvectl status || true
+          echo "::endgroup::"
+
+          echo "::group::libvirt default network"
+          sudo systemctl status libvirtd --no-pager || true
+          sudo virsh net-list --all || true
+          sudo virsh net-dumpxml default || true
+          echo "::endgroup::"
+
+      - name: Boot guest
+        working-directory: /tmp
+        run: |
+          mkdir -p vagrant-dns
+          cd vagrant-dns
+          vagrant init generic/ubuntu2204
+          vagrant box list
+          time vagrant up --provider=libvirt --no-tty
+
+      - name: Dump host and libvirt state after boot
+        working-directory: /tmp/vagrant-dns
+        run: |
+          echo "::group::dhcp leases"
+          sudo virsh net-dhcp-leases default || true
+          sudo virsh list --all || true
+          echo "::endgroup::"
+
+          echo "::group::port 53 listeners"
+          sudo ss -lunp | grep ':53' || true
+          echo "::endgroup::"
+
+          echo "::group::libvirt dnsmasq processes"
+          ps aux | grep -i '[d]nsmasq' || true
+          sudo journalctl -u libvirtd --no-pager --since '-15 min' | grep -i -E 'dnsmasq|dns|firewall|bind' || true
+          echo "::endgroup::"
+
+      - name: Dump guest DNS state
+        working-directory: /tmp/vagrant-dns
+        run: |
+          vagrant ssh -c 'set -x;
+            cat /etc/resolv.conf;
+            resolvectl status || true;
+            ip -4 addr;
+            ip route;
+            getent hosts apt.voxpupuli.org || true;
+            timeout 10 wget -q -O /dev/null https://apt.voxpupuli.org/ && echo WGET_OK || echo WGET_FAIL;
+            cat /etc/hosts' || true
+
+      - name: Test static DNS workaround in guest
+        working-directory: /tmp/vagrant-dns
+        run: |
+          vagrant ssh -c '
+            sudo rm -f /etc/resolv.conf;
+            printf "nameserver 1.1.1.1\nnameserver 9.9.9.9\n" | sudo tee /etc/resolv.conf;
+            cat /etc/resolv.conf;
+            getent hosts apt.voxpupuli.org;
+            timeout 15 wget -q -O /dev/null https://apt.voxpupuli.org/ && echo WGET_OK_WITH_STATIC_DNS || echo WGET_FAIL_WITH_STATIC_DNS' || true
+
+      - name: Destroy guest
+        if: always()
+        working-directory: /tmp/vagrant-dns
+        run: vagrant destroy -f || true
