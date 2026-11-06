@@ -9,6 +9,9 @@ name: Debug vagrant guest DNS
 # yamllint disable-line rule:truthy
 on:
   workflow_dispatch: {}
+  push:
+    branches:
+      - debug-dns
 
 permissions:
   contents: read
