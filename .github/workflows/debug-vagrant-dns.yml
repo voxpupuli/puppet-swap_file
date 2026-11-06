@@ -1,7 +1,7 @@
 ---
 # Temporary diagnostics for acceptance failures on Ubuntu 22.04 guests.
 # Reproduces the libvirt + dnsmasq setup used by voxpupuli/gha-puppet and
-# inspects guest DNS. Matrix compares box versions to spot regressions.
+# inspects guest DNS / DNSSEC state.
 # Delete this file once the root cause is fixed upstream.
 
 name: Debug vagrant guest DNS
@@ -26,7 +26,7 @@ jobs:
       matrix:
         box:
           - '4.3.12'
-          - '4.3.10'
+          - '4.3.6'
     env:
       LIBVIRT_DEFAULT_URI: qemu:///system
       VAGRANT_DEFAULT_PROVIDER: libvirt
@@ -43,66 +43,44 @@ jobs:
             qemu-system-x86 qemu-utils dnsmasq
           sudo chmod 666 /var/run/libvirt/libvirt-sock
 
-      - name: Dump runner state
-        run: |
-          echo "::group::dnsmasq packages"
-          apt-cache policy dnsmasq dnsmasq-base || true
-          echo "::endgroup::"
-          echo "::group::libvirt default network"
-          sudo virsh net-dumpxml default || true
-          echo "::endgroup::"
-          echo "::group::libvirt dnsmasq upstream"
-          sudo journalctl -u libvirtd --no-pager --since '-5 min' | grep -i -E 'dnsmasq|nameserver' || true
-          echo "::endgroup::"
-
       - name: Boot guest
         run: |
           mkdir -p "/tmp/vagrant-dns-${{ matrix.box }}"
           cd "/tmp/vagrant-dns-${{ matrix.box }}"
           vagrant init generic/ubuntu2204 --box-version "${{ matrix.box }}"
-          vagrant box list
           time vagrant up --provider=libvirt --no-tty
 
-      - name: Dump guest DNS configuration
-        run: |
-          cd "/tmp/vagrant-dns-${{ matrix.box }}"
-          vagrant ssh -c 'set -x;
-            ls -l /etc/resolv.conf;
-            cat /etc/resolv.conf;
-            sudo ls /etc/netplan;
-            sudo cat /etc/netplan/*.yaml || true;
-            resolvectl status;
-            resolvectl dns;
-            getent hosts apt.voxpupuli.org || echo GETENT_FAIL' 2>&1 | tail -80
-
-      - name: Probe each resolver from the guest
-        run: |
-          cd "/tmp/vagrant-dns-${{ matrix.box }}"
-          vagrant ssh -c 'set -x;
-            for s in 4.2.2.1 4.2.2.2 208.67.220.220 192.168.121.1 1.1.1.1 9.9.9.9; do
-              sudo sh -c "printf \"nameserver $s\n\" > /etc/resolv.conf";
-              printf "%s => " "$s";
-              timeout 5 getent hosts apt.voxpupuli.org >/dev/null 2>&1 && echo OK || echo FAIL;
-            done;
-            sudo rm -f /etc/resolv.conf;
-            sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf' 2>&1 | tail -40
-
-      - name: Diagnose systemd-resolved stub
+      - name: Inspect DNSSEC trust anchor
         run: |
           cd "/tmp/vagrant-dns-${{ matrix.box }}"
           vagrant ssh -c '
             set -x;
             date -u;
-            timedatectl || true;
+            ls -l /usr/share/dns/root.key /etc/trusted-key.key 2>&1;
+            wc -c /usr/share/dns/root.key 2>&1;
+            dpkg -l dns-root-data systemd 2>&1 | tail -6;
+            grep -R "TrustAnchorFile\|^DNSSEC" /etc/systemd/resolved.conf /usr/lib/systemd/resolved.conf 2>&1;
             resolvectl query example.com || true;
-            resolvectl query google.com || true;
             resolvectl query apt.voxpupuli.org || true;
-            sudo resolvectl statistics | head -20 || true;
-            echo "=== dnssec off on eth0 ===";
+            getent hosts example.com || echo GETENT_FAIL_EXAMPLE' 2>&1 | tail -40
+
+      - name: Disable DNSSEC and retest
+        run: |
+          cd "/tmp/vagrant-dns-${{ matrix.box }}"
+          vagrant ssh -c '
+            set -x;
             sudo resolvectl dnssec eth0 no;
             sudo resolvectl flush-caches;
-            getent hosts apt.voxpupuli.org || echo GETENT_FAIL_NO_DNSSEC;
-            timeout 15 wget -q -O /dev/null https://apt.voxpupuli.org/ && echo WGET_OK_NO_DNSSEC || echo WGET_FAIL_NO_DNSSEC' 2>&1 | tail -60
+            resolvectl status | head -25;
+            getent hosts example.com || echo GETENT_FAIL_LINK_NO_DNSSEC;
+            echo "=== global DNSSEC=no ===";
+            sudo sed -i "s/^#*DNSSEC=.*/DNSSEC=no/" /etc/systemd/resolved.conf;
+            grep DNSSEC /etc/systemd/resolved.conf;
+            sudo systemctl restart systemd-resolved;
+            sleep 3;
+            resolvectl status | head -20;
+            getent hosts example.com && echo GETENT_OK_DNSSEC_NO || echo GETENT_FAIL_DNSSEC_NO;
+            timeout 15 wget -q -O /dev/null https://apt.voxpupuli.org/ && echo WGET_OK_DNSSEC_NO || echo WGET_FAIL_DNSSEC_NO' 2>&1 | tail -50
 
       - name: Destroy guest
         if: always()
