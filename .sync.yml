@@ -1,3 +1,4 @@
+# puppet-swapfile sync.yml
 ---
 Gemfile:
   optional:
@@ -15,4 +16,4 @@ spec/spec_helper_acceptance.rb:
 .github/workflows/ci.yml:
   with:
     beaker_facter: 'memory.system.total:TotalMemory:300 MiB'
-    beaker_hypervisor: 'vagrant_libvirt'
+    beaker_hypervisor: 'lima'

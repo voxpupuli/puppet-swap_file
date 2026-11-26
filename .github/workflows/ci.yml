@@ -45,10 +45,10 @@ permissions:
 jobs:
   puppet:
     name: Puppet
-    uses: voxpupuli/gha-puppet/.github/workflows/beaker.yml@v4
+    uses: voxpupuli/gha-puppet/.github/workflows/beaker.yml@beaker_lima_2.3_integration
     with:
       beaker_staging_url: ${{ inputs.beaker_staging_url }}
       beaker_collection: ${{ inputs.beaker_collection }}
       beaker_staging_version: ${{ inputs.beaker_staging_version }}
       beaker_facter: 'memory.system.total:TotalMemory:300 MiB'
-      beaker_hypervisor: 'vagrant_libvirt'
+      beaker_hypervisor: 'lima'
